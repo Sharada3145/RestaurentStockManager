@@ -1,0 +1,328 @@
+text,label
+rice,rice
+basmati,rice
+white rice,rice
+brown rice,rice
+jasmine rice,rice
+chawal,rice
+basmati rice,rice
+long grain rice,rice
+short grain rice,rice
+cooked rice,rice
+raw rice,rice
+steamed rice,rice
+wheat flour,wheat flour
+flour,wheat flour
+maida,wheat flour
+atta,wheat flour
+all purpose flour,wheat flour
+bread flour,wheat flour
+plain flour,wheat flour
+self raising flour,wheat flour
+wholemeal flour,wheat flour
+refined flour,wheat flour
+white flour,wheat flour
+cake flour,wheat flour
+sugar,sugar
+white sugar,sugar
+caster sugar,sugar
+granulated sugar,sugar
+cheeni,sugar
+icing sugar,sugar
+powdered sugar,sugar
+brown sugar,sugar
+raw sugar,sugar
+demerara sugar,sugar
+table sugar,sugar
+refined sugar,sugar
+cane sugar,sugar
+salt,salt
+sea salt,salt
+rock salt,salt
+table salt,salt
+namak,salt
+kosher salt,salt
+iodised salt,salt
+fine salt,salt
+coarse salt,salt
+pink salt,salt
+himalayan salt,salt
+olive oil,olive oil
+extra virgin olive oil,olive oil
+evoo,olive oil
+virgin olive oil,olive oil
+pure olive oil,olive oil
+light olive oil,olive oil
+vegetable oil,vegetable oil
+cooking oil,vegetable oil
+sunflower oil,vegetable oil
+canola oil,vegetable oil
+refined oil,vegetable oil
+oil,vegetable oil
+soybean oil,vegetable oil
+corn oil,vegetable oil
+groundnut oil,vegetable oil
+palm oil,vegetable oil
+safflower oil,vegetable oil
+neutral oil,vegetable oil
+chicken,chicken
+murgh,chicken
+chicken breast,chicken
+chicken thigh,chicken
+boneless chicken,chicken
+whole chicken,chicken
+chicken leg,chicken
+chicken wings,chicken
+chicken pieces,chicken
+diced chicken,chicken
+chicken mince,chicken
+minced chicken,chicken
+chicken fillet,chicken
+grilled chicken,chicken
+raw chicken,chicken
+chicken drumstick,chicken
+beef,beef
+gosht,beef
+ground beef,beef
+minced beef,beef
+beef steak,beef
+brisket,beef
+beef mince,beef
+beef chuck,beef
+sirloin,beef
+beef fillet,beef
+beef ribs,beef
+stewing beef,beef
+diced beef,beef
+lean beef,beef
+lamb,lamb
+mutton,lamb
+lamb chop,lamb
+lamb mince,lamb
+sheep meat,lamb
+lamb rack,lamb
+lamb leg,lamb
+lamb shoulder,lamb
+lamb cutlet,lamb
+lamb shank,lamb
+diced lamb,lamb
+minced lamb,lamb
+onion,onion
+onions,onion
+red onion,onion
+white onion,onion
+spring onion,onion
+shallot,onion
+pyaz,onion
+yellow onion,onion
+green onion,onion
+scallion,onion
+pearl onion,onion
+baby onion,onion
+caramelised onion,onion
+garlic,garlic
+garlic cloves,garlic
+minced garlic,garlic
+garlic paste,garlic
+lahsun,garlic
+crushed garlic,garlic
+garlic powder,garlic
+garlic head,garlic
+whole garlic,garlic
+roasted garlic,garlic
+fresh garlic,garlic
+tomato,tomato
+tomatoes,tomato
+cherry tomato,tomato
+plum tomato,tomato
+tamatar,tomato
+roma tomato,tomato
+beefsteak tomato,tomato
+heirloom tomato,tomato
+sun dried tomato,tomato
+tinned tomato,tomato
+canned tomato,tomato
+chopped tomato,tomato
+diced tomato,tomato
+whole tomato,tomato
+potato,potato
+potatoes,potato
+aloo,potato
+sweet potato,potato
+baby potato,potato
+new potato,potato
+russet potato,potato
+mashed potato,potato
+diced potato,potato
+boiled potato,potato
+roast potato,potato
+jacket potato,potato
+carrot,carrot
+carrots,carrot
+gajar,carrot
+baby carrot,carrot
+shredded carrot,carrot
+diced carrot,carrot
+carrot sticks,carrot
+spinach,spinach
+palak,spinach
+baby spinach,spinach
+fresh spinach,spinach
+frozen spinach,spinach
+wilted spinach,spinach
+lemon,lemon
+lemons,lemon
+lime,lemon
+nimbu,lemon
+lemon juice,lemon
+lime juice,lemon
+fresh lemon,lemon
+lemon zest,lemon
+milk,milk
+full cream milk,milk
+skimmed milk,milk
+doodh,milk
+whole milk,milk
+semi skimmed milk,milk
+low fat milk,milk
+fresh milk,milk
+pasteurised milk,milk
+uht milk,milk
+butter,butter
+salted butter,butter
+unsalted butter,butter
+makhan,butter
+margarine,butter
+clarified butter,butter
+ghee,butter
+beurre,butter
+egg,egg
+eggs,egg
+anda,egg
+egg yolk,egg
+egg white,egg
+whole egg,egg
+free range egg,egg
+organic egg,egg
+large egg,egg
+medium egg,egg
+boiled egg,egg
+cheese,cheese
+cheddar,cheese
+mozzarella,cheese
+parmesan,cheese
+paneer,cheese
+cottage cheese,cheese
+feta,cheese
+gouda,cheese
+brie,cheese
+cream cheese,cheese
+ricotta,cheese
+grated cheese,cheese
+sliced cheese,cheese
+yogurt,yogurt
+dahi,yogurt
+curd,yogurt
+greek yogurt,yogurt
+plain yogurt,yogurt
+natural yogurt,yogurt
+set yogurt,yogurt
+low fat yogurt,yogurt
+cumin,cumin
+jeera,cumin
+cumin seeds,cumin
+ground cumin,cumin
+whole cumin,cumin
+black cumin,cumin
+roasted cumin,cumin
+coriander,coriander
+dhania,coriander
+coriander seeds,coriander
+ground coriander,coriander
+cilantro,coriander
+coriander powder,coriander
+fresh coriander,coriander
+coriander leaves,coriander
+turmeric,turmeric
+haldi,turmeric
+ground turmeric,turmeric
+turmeric powder,turmeric
+fresh turmeric,turmeric
+raw turmeric,turmeric
+paprika,paprika
+red chilli powder,paprika
+chili powder,paprika
+lal mirch,paprika
+smoked paprika,paprika
+hot paprika,paprika
+sweet paprika,paprika
+chilli flakes,paprika
+cayenne pepper,paprika
+red pepper flakes,paprika
+black pepper,black pepper
+pepper,black pepper
+kali mirch,black pepper
+ground pepper,black pepper
+whole peppercorn,black pepper
+black peppercorn,black pepper
+cracked pepper,black pepper
+cinnamon,cinnamon
+dalchini,cinnamon
+cinnamon sticks,cinnamon
+ground cinnamon,cinnamon
+cinnamon powder,cinnamon
+cassia,cinnamon
+ginger,ginger
+adrak,ginger
+ginger paste,ginger
+fresh ginger,ginger
+ground ginger,ginger
+ginger powder,ginger
+dried ginger,ginger
+ginger root,ginger
+minced ginger,ginger
+pasta,pasta
+spaghetti,pasta
+penne,pasta
+macaroni,pasta
+fettuccine,pasta
+lasagna sheets,pasta
+linguine,pasta
+rigatoni,pasta
+tagliatelle,pasta
+fusilli,pasta
+farfalle,pasta
+angel hair pasta,pasta
+lentils,lentils
+dal,lentils
+masoor,lentils
+moong,lentils
+toor dal,lentils
+chana dal,lentils
+red lentils,lentils
+green lentils,lentils
+black lentils,lentils
+split lentils,lentils
+urad dal,lentils
+chickpeas,chickpeas
+chana,chickpeas
+garbanzo beans,chickpeas
+kabuli chana,chickpeas
+canned chickpeas,chickpeas
+dried chickpeas,chickpeas
+white chickpeas,chickpeas
+tomato paste,tomato paste
+tomato puree,tomato paste
+tomato sauce,tomato paste
+tomato concentrate,tomato paste
+double concentrate tomato,tomato paste
+cream,cream
+heavy cream,cream
+whipping cream,cream
+double cream,cream
+fresh cream,cream
+single cream,cream
+soured cream,cream
+sour cream,cream
+clotted cream,cream
+thickened cream,cream
