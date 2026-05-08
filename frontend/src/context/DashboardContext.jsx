@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   getActivity, getAllForecasts, getHealth,
-  getInventory, getUnmapped, getUsage,
+  getInventory, getUnmapped, getUsage, getTodayBatches
 } from '../services/api';
 
 const DashboardCtx = createContext(null);
@@ -15,14 +15,17 @@ export function DashboardProvider({ children }) {
   const [forecasts,  setForecasts]  = useState([]);
   const [unmapped,   setUnmapped]   = useState([]);
   const [activity,   setActivity]   = useState([]);
+  const [todayBatches, setTodayBatches] = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error,      setError]      = useState(null);
 
   const [counters, setCounters] = useState({
-    totalTracked:  0,
-    alerts:        0,
-    unmappedCount: 0,
+    totalTracked:   0,
+    alerts:         0,
+    unmappedCount:  0,
+    todayPurchased: 0,
+    todayUsed:      0,
   });
 
   const [pendingEntries,     setPendingEntries]     = useState([]);
@@ -37,29 +40,39 @@ export function DashboardProvider({ children }) {
     setError(null);
 
     try {
-      const [h, inv, u, fc, um, act] = await Promise.allSettled([
+      const [h, i, uAll, uToday, fc, um, act, batches] = await Promise.allSettled([
         getHealth(),
         getInventory(),
         getUsage(),
+        getUsage(1), // Today's usage only
         getAllForecasts(),
         getUnmapped(),
         getActivity(20),
+        getTodayBatches(),
       ]);
 
-      if (h.status   === 'fulfilled') setHealth(h.value);
-      if (inv.status === 'fulfilled') {
-        const invData = inv.value || [];
+      if (h.status  === 'fulfilled') setHealth(h.value);
+      if (i.status  === 'fulfilled') {
+        const invData = i.value || [];
         setInventory(invData);
         setCounters((prev) => ({
           ...prev,
           alerts: invData.filter((i) => i.alert).length,
         }));
       }
-      if (u.status  === 'fulfilled') {
-        setUsage(u.value);
-        const total = Object.values(u.value?.total_usage || {}).reduce((a, b) => a + b, 0);
+      
+      if (uAll.status === 'fulfilled') {
+        setUsage(uAll.value);
+        // Tracked total based on all usage
+        const total = Object.values(uAll.value?.total_usage || {}).reduce((a, b) => a + b, 0);
         setCounters((prev) => ({ ...prev, totalTracked: Math.round(total * 10) / 10 }));
       }
+
+      if (uToday.status === 'fulfilled') {
+        const todayTotal = Object.values(uToday.value?.total_usage || {}).reduce((a, b) => a + b, 0);
+        setCounters((prev) => ({ ...prev, todayUsed: todayTotal }));
+      }
+
       if (fc.status === 'fulfilled') setForecasts(fc.value || []);
       if (um.status === 'fulfilled') {
         const umData = um.value || [];
@@ -69,6 +82,12 @@ export function DashboardProvider({ children }) {
       if (act.status === 'fulfilled') {
         setActivity(act.value || []);
         setPendingEntries([]);
+      }
+      if (todayBatches.status === 'fulfilled') {
+        const batchData = todayBatches.value || [];
+        setTodayBatches(batchData);
+        const purchased = batchData.reduce((acc, b) => acc + b.purchased_quantity, 0);
+        setCounters((prev) => ({ ...prev, todayPurchased: purchased }));
       }
     } catch (err) {
       setError(err?.message || 'Failed to load dashboard data');
@@ -118,6 +137,7 @@ export function DashboardProvider({ children }) {
     forecasts,
     unmapped,
     activity,
+    todayBatches,
     counters,
     loading,
     refreshing,

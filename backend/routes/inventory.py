@@ -43,10 +43,13 @@ class InventoryItemResponse(BaseModel):
     ingredient:        str
     category:          str
     current_stock:     float
+    opening_stock:     float
+    used_today:        float
     unit:              str
     reorder_threshold: float
     last_updated:      datetime
     alert:             Optional[str] = None
+    status:            str  # CRITICAL, WARNING, HEALTHY
 
 
 class RestockResponse(BaseModel):
@@ -62,30 +65,64 @@ class RestockResponse(BaseModel):
 @router.get(
     "/inventory",
     response_model=List[InventoryItemResponse],
-    summary="Get full inventory with alerts",
+    summary="Get full inventory with daily operation metrics",
 )
 def get_inventory():
+    from sqlalchemy import func
     from backend.database import get_session
-    from backend.models import Ingredient, Inventory
+    from backend.models import Ingredient, Inventory, UsageLog, DailyStockBatch
     from backend.services.inventory_service import get_low_stock_alert
 
     session = get_session()
     try:
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
         items = session.query(Inventory).all()
         result = []
         for inv in items:
             ing = session.query(Ingredient).filter_by(id=inv.ingredient_id).first()
             if not ing:
                 continue
+
+            # Calculate usage today
+            used_today = session.query(func.sum(UsageLog.quantity)).filter(
+                UsageLog.ingredient_id == inv.ingredient_id,
+                UsageLog.logged_at >= today_start
+            ).scalar() or 0.0
+
+            # Calculate purchases today
+            purchased_today = session.query(func.sum(DailyStockBatch.purchased_quantity)).filter(
+                DailyStockBatch.ingredient_id == inv.ingredient_id,
+                DailyStockBatch.batch_date >= today_start
+            ).scalar() or 0.0
+
+            # Opening stock for today
+            opening_stock = inv.current_stock + used_today - purchased_today
+
+            # Determine status
+            # Using opening_stock as the reference for percentage if possible, else reorder_threshold
+            ref_value = max(opening_stock, inv.reorder_threshold * 2)
+            ratio = inv.current_stock / ref_value if ref_value > 0 else 0
+            
+            if ratio < 0.1 or inv.current_stock <= inv.reorder_threshold * 0.5:
+                status_str = "CRITICAL"
+            elif ratio < 0.3 or inv.current_stock <= inv.reorder_threshold:
+                status_str = "WARNING"
+            else:
+                status_str = "HEALTHY"
+
             alert = get_low_stock_alert(session, inv.ingredient_id, ing.name)
+            
             result.append(InventoryItemResponse(
                 ingredient=ing.name,
                 category=ing.category,
                 current_stock=inv.current_stock,
+                opening_stock=opening_stock,
+                used_today=used_today,
                 unit=inv.unit,
                 reorder_threshold=inv.reorder_threshold,
                 last_updated=inv.last_updated,
                 alert=alert,
+                status=status_str
             ))
         return result
     finally:

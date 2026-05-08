@@ -82,6 +82,7 @@ from backend.routes.inventory    import router as inventory_router
 from backend.routes.analytics    import router as analytics_router
 from backend.routes.prediction   import router as prediction_router
 from backend.routes.ingredients  import router as ingredients_router
+from backend.routes.daily_batches import router as batch_router
 
 PREFIX = "/api/v1"
 
@@ -91,6 +92,7 @@ app.include_router(inventory_router,   prefix=PREFIX)
 app.include_router(analytics_router,   prefix=PREFIX)
 app.include_router(prediction_router,  prefix=PREFIX)
 app.include_router(ingredients_router, prefix=PREFIX)
+app.include_router(batch_router,        prefix=f"{PREFIX}/batches")
 
 
 # ── Root ─────────────────────────────────────────────────────────────────────

@@ -16,6 +16,10 @@ export const postInventory = (payload) => api.post('/inventory', payload).then((
 export const getLowStock   = ()        => api.get('/inventory/low-stock').then((r) => r.data);
 export const postRestock   = (payload) => api.post('/restock', payload).then((r) => r.data);
 
+// ── Daily Batches ────────────────────────────────────────────────────────
+export const getTodayBatches = ()        => api.get('/batches/today').then((r) => r.data);
+export const postBatch        = (payload) => api.post('/batches', payload).then((r) => r.data);
+
 // ── Analytics ─────────────────────────────────────────────────────────────
 export const getUsage           = (days) => api.get('/usage', { params: days ? { days } : {} }).then((r) => r.data);
 export const getUnmapped        = ()     => api.get('/unmapped').then((r) => r.data);

@@ -44,6 +44,7 @@ class Ingredient(Base):
 
     aliases       = relationship("Alias",        back_populates="ingredient", cascade="all, delete-orphan")
     usage_logs    = relationship("UsageLog",     back_populates="ingredient", cascade="all, delete-orphan")
+    daily_batches = relationship("DailyStockBatch", back_populates="ingredient", cascade="all, delete-orphan")
     inventory     = relationship("Inventory",    back_populates="ingredient", uselist=False, cascade="all, delete-orphan")
 
 
@@ -102,6 +103,27 @@ class UnmappedEntry(Base):
     manual_mapping  = Column(String(100), nullable=True, index=True)
     created_at      = Column(DateTime, default=datetime.utcnow, index=True)
     mapped_at       = Column(DateTime, nullable=True)
+
+
+# ---------------------------------------------------------------------------
+# DailyStockBatch
+# ---------------------------------------------------------------------------
+
+class DailyStockBatch(Base):
+    __tablename__ = "daily_stock_batches"
+
+    id                 = Column(Integer, primary_key=True, index=True)
+    ingredient_id      = Column(Integer, ForeignKey("ingredients.id"), nullable=False)
+    purchased_quantity = Column(Float,   nullable=False)
+    allocated_quantity = Column(Float,   nullable=False, default=0.0)
+    remaining_quantity = Column(Float,   nullable=False)
+    unit               = Column(String(20), nullable=False)
+    supplier_name      = Column(String(100), nullable=True)
+    purchase_cost      = Column(Float,   nullable=True)
+    batch_date         = Column(DateTime, default=datetime.utcnow, index=True)
+    created_at         = Column(DateTime, default=datetime.utcnow)
+
+    ingredient = relationship("Ingredient", back_populates="daily_batches")
 
 
 # ---------------------------------------------------------------------------
