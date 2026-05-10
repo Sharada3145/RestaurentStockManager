@@ -226,3 +226,42 @@ def add_aliases(name: str, payload: AddAliasRequest):
     finally:
         if session:
             session.close()
+
+
+@router.delete(
+    "/ingredients/{name}",
+    summary="Delete an ingredient from the catalog",
+)
+def delete_ingredient(name: str):
+    from backend.database import get_session, rollback_and_log
+    from backend.models import Ingredient, Inventory, Alias, UsageLog, StockBatch
+
+    session = None
+    try:
+        session = get_session()
+        with session.begin():
+            ing = session.query(Ingredient).filter_by(name=name.lower().strip()).first()
+            if not ing:
+                raise HTTPException(status_code=404, detail=f"Ingredient '{name}' not found")
+
+            # Delete related data first
+            session.query(Inventory).filter_by(ingredient_id=ing.id).delete()
+            session.query(Alias).filter_by(ingredient_id=ing.id).delete()
+            session.query(UsageLog).filter_by(ingredient_id=ing.id).delete()
+            
+            # Note: StockBatch might be used in other routes, delete if exclusive
+            # session.query(StockBatch).filter_by(ingredient_id=ing.id).delete()
+
+            session.delete(ing)
+
+        return {"message": f"Ingredient '{name}' deleted successfully"}
+
+    except HTTPException:
+        raise
+    except SQLAlchemyError as exc:
+        if session:
+            rollback_and_log(session, "SQLAlchemyError in delete_ingredient")
+        raise HTTPException(status_code=500, detail="Database failure") from exc
+    finally:
+        if session:
+            session.close()

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar } from './components/Sidebar';
 import { Toast }   from './components/Toast';
@@ -10,6 +10,7 @@ import { ForecastsPage }   from './pages/ForecastsPage';
 import { AnalyticsPage }   from './pages/AnalyticsPage';
 import { IngredientsPage } from './pages/IngredientsPage';
 import { useDashboard }    from './context/DashboardContext';
+import { RefreshCw, Calendar, User, Bell, ChevronRight } from 'lucide-react';
 import {
   postEntry,
   postInventory,
@@ -19,20 +20,29 @@ import {
 } from './services/api';
 
 const PAGE_TITLES = {
-  dashboard:   'Dashboard',
-  entry:       'Stock Entry',
-  inventory:   'Inventory',
-  forecasts:   'Forecasts',
-  analytics:   'Analytics',
+  dashboard:   'Kitchen Operations',
+  entry:       'Stock Intake',
+  inventory:   'Inventory Management',
+  forecasts:   'Usage Predictions',
+  analytics:   'Performance Analytics',
   unmapped:    'Review Queue',
-  ingredients: 'Ingredients',
+  ingredients: 'Ingredient Catalogue',
 };
 
 export default function App() {
   const [page, setPage]     = useState('dashboard');
   const [toasts, setToasts] = useState([]);
 
-  const { refreshDashboard, addPendingEntry, optimisticIncrement } = useDashboard();
+  const { refreshDashboard, addPendingEntry, optimisticIncrement, health } = useDashboard();
+
+  const currentDate = useMemo(() => {
+    return new Intl.DateTimeFormat('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date());
+  }, []);
 
   // ── Toast helpers ─────────────────────────────────────────────────────────
   const notify = useCallback((message, type = 'success') => {
@@ -133,29 +143,81 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-900">
+    <div className="flex h-screen overflow-hidden bg-luxury-cream text-luxury-text-primary">
       {/* Sidebar */}
       <Sidebar activePage={page} onNavigate={setPage} />
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={page}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-            >
-              {renderPage()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </main>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        
+        {/* Decorative Top Background Accent */}
+        <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-luxury-gold/5 to-transparent pointer-events-none" />
+
+        {/* Top Header */}
+        <header className="h-24 shrink-0 border-b border-luxury-border bg-white/40 backdrop-blur-2xl flex items-center justify-between px-10 z-10">
+          <div className="flex items-center gap-8">
+             <div className="hidden lg:flex items-center gap-3 text-luxury-text-muted">
+                <Calendar size={18} className="text-luxury-gold" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{currentDate}</span>
+             </div>
+             <div className="h-6 w-px bg-luxury-border hidden lg:block" />
+             <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-luxury-gold uppercase tracking-[0.3em]">StockIQ</span>
+                <ChevronRight size={14} className="text-luxury-border" />
+                <h2 className="text-sm font-black text-luxury-text-primary uppercase tracking-[0.2em]">
+                   {PAGE_TITLES[page]}
+                </h2>
+             </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+             <button 
+                onClick={() => refreshDashboard()}
+                className="p-3 rounded-2xl bg-white/60 border border-luxury-border text-luxury-text-muted hover:text-luxury-gold hover:border-luxury-gold/30 transition-all active:scale-95 shadow-sm"
+                title="Refresh Intelligence"
+             >
+                <RefreshCw size={20} />
+             </button>
+             
+             <div className="h-8 w-px bg-luxury-border" />
+
+             <div className="flex items-center gap-4 pl-2">
+                <div className="text-right hidden sm:block">
+                   <p className="text-xs font-black text-luxury-text-primary uppercase tracking-tighter">Executive Chef</p>
+                   <div className="flex items-center justify-end gap-2">
+                      <div className={`w-2 h-2 rounded-full ${health?.status === 'ok' ? 'bg-status-success' : 'bg-status-danger'}`} />
+                      <p className="text-[10px] font-bold text-luxury-text-muted uppercase tracking-widest">Verified Console</p>
+                   </div>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-luxury-gradient p-0.5 shadow-gold hover:scale-105 transition-transform cursor-pointer">
+                   <div className="w-full h-full rounded-[14px] bg-white flex items-center justify-center">
+                      <User size={22} className="text-luxury-gold" />
+                   </div>
+                </div>
+             </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto custom-scrollbar relative z-0">
+          <div className="mx-auto max-w-[1400px] px-10 py-12">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={page}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+              >
+                {renderPage()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </main>
+      </div>
 
       {/* Toast notifications */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
+      <div className="fixed bottom-10 right-10 z-50 flex flex-col gap-4 pointer-events-none">
         <AnimatePresence>
           {toasts.map((t) => (
             <Toast

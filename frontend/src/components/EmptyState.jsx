@@ -1,16 +1,16 @@
-export function EmptyState({ icon: Icon, title, message, action }) {
+export function EmptyState({ icon: Icon, title, message, action, theme = 'warm' }) {
   return (
-    <div className="glass-card flex flex-col items-center justify-center gap-4 py-20 text-center">
+    <div className="glass-panel flex flex-col items-center justify-center gap-10 py-32 text-center border-luxury-gold/5 bg-white/40 shadow-premium">
       {Icon && (
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-700/60 border border-white/[0.06] text-slate-500">
-          <Icon size={26} />
+        <div className="flex h-24 w-24 items-center justify-center rounded-[40px] bg-white border border-luxury-border text-luxury-gold shadow-premium animate-float">
+          <Icon size={48} />
         </div>
       )}
-      <div>
-        <h3 className="text-base font-semibold text-slate-300">{title}</h3>
-        {message && <p className="mt-1 text-sm text-slate-500 max-w-xs mx-auto">{message}</p>}
+      <div className="space-y-4">
+        <h3 className="text-3xl font-black text-luxury-text-primary tracking-tight">{title}</h3>
+        {message && <p className="text-base font-medium text-luxury-text-muted max-w-md mx-auto leading-relaxed">{message}</p>}
       </div>
-      {action && <div className="mt-2">{action}</div>}
+      {action && <div className="mt-6">{action}</div>}
     </div>
   );
 }

@@ -43,6 +43,8 @@ export const postIngredient  = (payload) => api.post('/ingredients', payload).th
 export const getAliases      = (name)    => api.get(`/ingredients/${encodeURIComponent(name)}/aliases`).then((r) => r.data);
 export const postAliases     = (name, aliases) =>
   api.post(`/ingredients/${encodeURIComponent(name)}/aliases`, { aliases }).then((r) => r.data);
+export const deleteIngredient = (name) =>
+  api.delete(`/ingredients/${encodeURIComponent(name)}`).then((r) => r.data);
 
 // ── Health ────────────────────────────────────────────────────────────────
 export const getHealth = () => api.get('/health').then((r) => r.data);

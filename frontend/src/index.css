@@ -12,111 +12,119 @@
   }
 
   body {
-    @apply bg-surface-950 text-slate-200 font-sans antialiased;
+    @apply bg-luxury-cream text-luxury-text-primary font-sans antialiased;
     background-image: 
-      radial-gradient(circle at 50% -20%, rgba(99,102,241,0.15), transparent),
-      radial-gradient(circle at 0% 0%, rgba(45,212,191,0.05), transparent);
+      radial-gradient(circle at 50% -20%, rgba(201, 162, 39, 0.08), transparent),
+      radial-gradient(circle at 0% 0%, rgba(201, 122, 64, 0.05), transparent);
     min-height: 100vh;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { @apply bg-surface-950; }
-  ::-webkit-scrollbar-thumb { @apply bg-surface-700 rounded-full; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-brand-500; }
+  ::-webkit-scrollbar-track { @apply bg-luxury-cream; }
+  ::-webkit-scrollbar-thumb { @apply bg-luxury-gold/20 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-luxury-gold/40; }
 
-  ::selection { @apply bg-brand-500/30 text-white; }
+  ::selection { @apply bg-luxury-gold/20 text-luxury-text-primary; }
 }
 
 /* ── Design System ────────────────────────────────────────────────────────── */
 @layer components {
 
-  /* Modern Glass Card */
-  .glass-card {
-    @apply rounded-2xl border border-white/[0.05] bg-surface-900/60 backdrop-blur-xl shadow-glass;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Premium Frosted Glass Panel */
+  .glass-panel {
+    @apply rounded-3xl border border-luxury-border bg-white/75 backdrop-blur-xl shadow-premium;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .glass-card-hover {
-    @apply glass-card cursor-pointer;
+  .glass-panel-hover {
+    @apply glass-panel cursor-pointer;
   }
-  .glass-card-hover:hover {
-    @apply border-white/[0.1] bg-surface-900/80 -translate-y-0.5;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 12px 40px rgba(0,0,0,0.5);
+  .glass-panel-hover:hover {
+    @apply border-luxury-gold/30 bg-white/90 -translate-y-1 shadow-gold;
   }
 
   /* KPI Stat Card */
   .kpi-card {
-    @apply glass-card p-6 overflow-hidden relative;
+    @apply glass-panel p-8 overflow-hidden relative;
   }
   .kpi-card::after {
     content: '';
-    @apply absolute top-0 right-0 w-32 h-32 bg-brand-500/5 blur-3xl rounded-full -mr-16 -mt-16;
+    @apply absolute top-0 right-0 w-40 h-40 bg-luxury-gold/5 blur-[80px] rounded-full -mr-20 -mt-20;
   }
 
-  /* Premium Buttons */
+  /* Hospitality Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 
-           text-sm font-semibold text-white shadow-glow transition-all duration-200
-           hover:bg-brand-400 hover:shadow-brand-400/30 active:scale-[0.97] disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-luxury-gradient px-6 py-3 
+           text-sm font-bold text-white shadow-gold transition-all duration-300
+           hover:shadow-gold-lg hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] 
-           bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-slate-300 transition-all duration-200
-           hover:bg-white/[0.08] hover:text-white active:scale-[0.97];
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-luxury-border 
+           bg-white/50 px-6 py-3 text-sm font-semibold text-luxury-text-primary transition-all duration-300
+           hover:bg-white/80 hover:border-luxury-gold/30 active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 
-           text-sm font-medium text-slate-400 transition-all duration-200
-           hover:bg-white/[0.05] hover:text-slate-200;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-2.5 
+           text-sm font-medium text-luxury-text-secondary transition-all duration-300
+           hover:bg-luxury-gold/5 hover:text-luxury-text-primary;
   }
 
-  /* Badges */
+  /* Hospitality Badges (Pill Style) */
   .badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider;
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest;
   }
-  .badge-success { @apply badge bg-accent-emerald/10 text-accent-emerald border border-accent-emerald/20; }
-  .badge-warning { @apply badge bg-accent-amber/10  text-accent-amber  border border-accent-amber/20; }
-  .badge-danger  { @apply badge bg-accent-rose/10   text-accent-rose   border border-accent-rose/20; }
-  .badge-info    { @apply badge bg-brand-500/10     text-brand-400     border border-brand-500/20; }
+  .badge-success { @apply badge bg-status-success/10 text-status-success border border-status-success/20; }
+  .badge-warning { @apply badge bg-status-warning/10 text-status-warning border border-status-warning/20; }
+  .badge-danger  { @apply badge bg-status-danger/10  text-status-danger  border border-status-danger/20; }
+  .badge-gold    { @apply badge bg-luxury-gold/10    text-luxury-gold    border border-luxury-gold/20; }
 
-  /* Inputs */
-  .input-modern {
-    @apply w-full rounded-xl border border-white/[0.08] bg-surface-900/50 px-4 py-3
-           text-sm text-slate-200 placeholder-slate-500 outline-none ring-offset-surface-950 transition-all
-           focus:border-brand-500/50 focus:ring-4 focus:ring-brand-500/10;
-  }
-
-  /* Navigation */
-  .nav-link {
-    @apply flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-400
-           transition-all duration-200 hover:bg-white/[0.04] hover:text-slate-200;
-  }
-  .nav-link-active {
-    @apply bg-brand-500/10 text-brand-400 border border-brand-500/10;
+  /* Chef-Friendly Inputs */
+  .input-premium {
+    @apply w-full rounded-2xl border border-luxury-border bg-white/50 px-5 py-4
+           text-base text-luxury-text-primary placeholder-luxury-text-muted outline-none transition-all duration-300
+           focus:border-luxury-gold/40 focus:bg-white/80 focus:ring-4 focus:ring-luxury-gold/5;
   }
 
-  /* Data Table */
-  .table-container {
-    @apply w-full overflow-hidden rounded-2xl border border-white/[0.05] bg-surface-900/40 backdrop-blur-md;
+  /* Navigation Sidebar */
+  .nav-item {
+    @apply flex items-center gap-3 rounded-2xl px-5 py-4 text-sm font-semibold text-luxury-text-secondary
+           transition-all duration-300 hover:bg-luxury-gold/5 hover:text-luxury-text-primary;
   }
-  .table-header {
-    @apply border-b border-white/[0.05] bg-white/[0.02] text-left text-xs font-semibold uppercase tracking-wider text-slate-500;
+  .nav-item-active {
+    @apply bg-luxury-gold/10 text-luxury-gold border border-luxury-gold/20 shadow-gold;
   }
-  .table-row {
-    @apply border-b border-white/[0.03] transition-colors hover:bg-white/[0.01];
+
+  /* Premium Data Table */
+  .data-table-container {
+    @apply w-full overflow-x-auto rounded-3xl border border-luxury-border bg-white/50 backdrop-blur-xl shadow-premium;
+  }
+  .data-table-header {
+    @apply border-b border-luxury-border bg-white/80 px-6 py-4 text-left text-xs font-bold uppercase tracking-widest text-luxury-text-muted;
+  }
+  .data-table-row {
+    @apply border-b border-luxury-border/50 transition-all duration-300 hover:bg-luxury-gold/[0.02];
+  }
+  .data-table-row-alt {
+    @apply bg-luxury-cream/30;
   }
 }
 
-/* ── Animations ──────────────────────────────────────────────────────────── */
-@keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
+/* ── Utility Classes ─────────────────────────────────────────────────────── */
+.text-gold { @apply text-luxury-gold; }
+.bg-gold   { @apply bg-luxury-gold; }
+.border-gold { @apply border-luxury-gold/20; }
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(201, 162, 39, 0.15);
 }
 
-.animate-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite linear;
+.luxury-card {
+  @apply glass-panel p-6;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+}
+
+.gradient-text {
+  @apply bg-luxury-gradient bg-clip-text text-transparent;
 }

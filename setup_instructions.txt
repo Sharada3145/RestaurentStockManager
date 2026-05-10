@@ -1,0 +1,62 @@
+# StockIQ: Premium Restaurant Operations Dashboard
+# Setup & Running Instructions
+
+This project consists of a FastAPI backend and a Vite-React frontend.
+
+## 1. Prerequisites
+- Node.js (v18 or higher)
+- Python (3.11 or higher)
+- Docker Desktop (Optional, for containerized backend)
+
+---
+
+## 2. Running Locally (Development Mode)
+
+### A. Backend Setup (Python/FastAPI)
+1. Open a terminal in the root directory.
+2. Navigate to the backend folder:
+   cd backend
+3. Create a virtual environment:
+   python -m venv venv
+4. Activate the virtual environment:
+   # Windows:
+   .\venv\Scripts\activate
+   # macOS/Linux:
+   source venv/bin/activate
+5. Install dependencies:
+   pip install -r requirements.txt
+6. Launch the API server:
+   uvicorn main:app --reload --port 8000
+   
+The backend will be available at: http://localhost:8000
+
+### B. Frontend Setup (React/Vite)
+1. Open a SECOND terminal in the root directory.
+2. Navigate to the frontend folder:
+   cd frontend
+3. Install dependencies:
+   npm install
+4. Start the development server:
+   npm run dev
+   
+The frontend will be available at: http://localhost:5173 (usually)
+
+---
+
+## 3. Running with Docker (Backend Only)
+
+If you have Docker installed, you can run the backend using the provided compose file:
+
+1. Open a terminal in the root directory.
+2. Run the following command:
+   docker-compose up --build
+   
+This will build and start the "stockiq-backend" container on port 8000.
+Note: You still need to run the frontend locally using the "npm run dev" steps above.
+
+---
+
+## 4. Troubleshooting
+- Port 8000: Ensure no other service is using port 8000, as the frontend expects the API at this address.
+- Environment Variables: All configurations use sensible defaults for local development (SQLite database is auto-generated).
+- Build Errors: If "npm install" fails, ensure you have the latest stable version of Node.js.
