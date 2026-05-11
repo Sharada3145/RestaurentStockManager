@@ -5,6 +5,7 @@ GET  /api/v1/ingredients              – Catalogue of all ingredients
 POST /api/v1/ingredients              – Add new ingredient + aliases
 GET  /api/v1/ingredients/{name}/aliases – List aliases for one ingredient
 POST /api/v1/ingredients/{name}/aliases – Add alias(es) to an ingredient
+DELETE /api/v1/ingredients/{name}      – Delete ingredient and all related data
 """
 
 from __future__ import annotations
@@ -234,7 +235,7 @@ def add_aliases(name: str, payload: AddAliasRequest):
 )
 def delete_ingredient(name: str):
     from backend.database import get_session, rollback_and_log
-    from backend.models import Ingredient, Inventory, Alias, UsageLog, StockBatch
+    from backend.models import Ingredient
 
     session = None
     try:
@@ -244,23 +245,21 @@ def delete_ingredient(name: str):
             if not ing:
                 raise HTTPException(status_code=404, detail=f"Ingredient '{name}' not found")
 
-            # Delete related data first
-            session.query(Inventory).filter_by(ingredient_id=ing.id).delete()
-            session.query(Alias).filter_by(ingredient_id=ing.id).delete()
-            session.query(UsageLog).filter_by(ingredient_id=ing.id).delete()
-            
-            # Note: StockBatch might be used in other routes, delete if exclusive
-            # session.query(StockBatch).filter_by(ingredient_id=ing.id).delete()
-
+            # Relationships are configured with cascade="all, delete-orphan", 
+            # so session.delete(ing) will remove Inventory, Alias, UsageLog, and DailyStockBatch records.
             session.delete(ing)
 
+        logger.info("[ingredients] deleted '%s'", name)
         return {"message": f"Ingredient '{name}' deleted successfully"}
 
     except HTTPException:
+        if session:
+            rollback_and_log(session, "HTTPException in delete_ingredient")
         raise
     except SQLAlchemyError as exc:
         if session:
             rollback_and_log(session, "SQLAlchemyError in delete_ingredient")
+        logger.exception("Delete failure")
         raise HTTPException(status_code=500, detail="Database failure") from exc
     finally:
         if session:
