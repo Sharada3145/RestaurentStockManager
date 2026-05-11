@@ -86,6 +86,28 @@ class CategoryUsageResponse(BaseModel):
     quantity: float
 
 
+class ChefUsageItem(BaseModel):
+    ingredient: str
+    quantity_used: float
+    unit: str
+    time: str
+    remaining_stock: float
+
+
+class ChefUsageDetail(BaseModel):
+    chef_name: str
+    status: str
+    total_quantity_used: float
+    items_count: int
+    last_activity: str
+    items: List[ChefUsageItem]
+
+
+class ChefUsageOverviewResponse(BaseModel):
+    summary: dict
+    chefs: List[ChefUsageDetail]
+
+
 # ── Routes ─────────────────────────────────────────────────────────────────
 
 @router.get("/usage", response_model=UsageStatsResponse, summary="Get usage statistics")
@@ -247,5 +269,25 @@ def get_category_usage(days: Optional[int] = None):
             CategoryUsageResponse(category=cat, quantity=round(qty, 4))
             for cat, qty in sorted(by_cat.items(), key=lambda x: x[1], reverse=True)
         ]
+    finally:
+        session.close()
+
+
+@router.get(
+    "/analytics/chef-usage",
+    response_model=ChefUsageOverviewResponse,
+    summary="Get detailed chef usage overview"
+)
+def get_chef_usage_overview(days: int = 1):
+    """
+    Returns a detailed breakdown of which chef used what grocery item,
+    how much, when, and remaining stock.
+    """
+    from backend.database import get_session
+    from backend.utils.aggregation import chef_usage_detail
+
+    session = get_session()
+    try:
+        return chef_usage_detail(session, days=days)
     finally:
         session.close()

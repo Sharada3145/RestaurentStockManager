@@ -88,10 +88,18 @@ def create_batch(payload: BatchCreateRequest, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(new_batch)
         
-        # Add ingredient_name for response
-        resp = BatchResponse.from_orm(new_batch)
-        resp.ingredient_name = ingredient.name
-        return resp
+        # Construct response manually to avoid Pydantic validation errors
+        return BatchResponse(
+            id=new_batch.id,
+            ingredient_id=new_batch.ingredient_id,
+            ingredient_name=ingredient.name,
+            purchased_quantity=new_batch.purchased_quantity,
+            remaining_quantity=new_batch.remaining_quantity,
+            unit=new_batch.unit,
+            supplier_name=new_batch.supplier_name,
+            purchase_cost=new_batch.purchase_cost,
+            batch_date=new_batch.batch_date
+        )
         
     except Exception as e:
         db.rollback()
@@ -109,8 +117,17 @@ def get_today_batches(db: Session = Depends(get_db)):
     results = []
     for b in batches:
         ing_name = db.query(Ingredient.name).filter(Ingredient.id == b.ingredient_id).scalar()
-        resp = BatchResponse.from_orm(b)
-        resp.ingredient_name = ing_name or "Unknown"
+        resp = BatchResponse(
+            id=b.id,
+            ingredient_id=b.ingredient_id,
+            ingredient_name=ing_name or "Unknown",
+            purchased_quantity=b.purchased_quantity,
+            remaining_quantity=b.remaining_quantity,
+            unit=b.unit,
+            supplier_name=b.supplier_name,
+            purchase_cost=b.purchase_cost,
+            batch_date=b.batch_date
+        )
         results.append(resp)
         
     return results

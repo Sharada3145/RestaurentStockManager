@@ -31,6 +31,8 @@ export const getTimeline         = (days = 30, ingredient) =>
   api.get('/analytics/timeline', { params: { days, ...(ingredient ? { ingredient } : {}) } }).then((r) => r.data);
 export const getCategoryUsage    = (days)              =>
   api.get('/analytics/category', { params: days ? { days } : {} }).then((r) => r.data);
+export const getChefUsageDetailed = (days = 1) =>
+  api.get('/analytics/chef-usage', { params: { days } }).then((r) => r.data);
 
 // ── Prediction ────────────────────────────────────────────────────────────
 export const getPrediction  = (ingredient, lookbackDays = 30) =>

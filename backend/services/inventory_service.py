@@ -34,6 +34,13 @@ def deduct_stock(
         logger.debug("[inventory] no inventory row for ingredient_id=%s", ingredient_id)
         return None
 
+    if inv.current_stock < float(quantity):
+        logger.warning(
+            "[inventory] insufficient stock for ingredient_id=%s: need %.4f, have %.4f",
+            ingredient_id, quantity, inv.current_stock
+        )
+        raise ValueError(f"Insufficient stock: {inv.current_stock:.2f} available, {quantity:.2f} requested")
+
     prev_stock = inv.current_stock
     inv.current_stock = max(0.0, prev_stock - float(quantity))
     inv.last_updated  = datetime.utcnow()

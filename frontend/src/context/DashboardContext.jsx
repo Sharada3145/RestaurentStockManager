@@ -6,7 +6,7 @@ import {
 
 const DashboardCtx = createContext(null);
 
-const POLL_INTERVAL = 30_000; // 30 seconds
+const POLL_INTERVAL = 30_000;
 
 export function DashboardProvider({ children }) {
   const [health,     setHealth]     = useState(null);
@@ -33,7 +33,6 @@ export function DashboardProvider({ children }) {
 
   const pollTimer = useRef(null);
 
-  // ── Core fetch ─────────────────────────────────────────────────────────
   const fetchAll = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     else         setRefreshing(true);
@@ -44,51 +43,48 @@ export function DashboardProvider({ children }) {
         getHealth(),
         getInventory(),
         getUsage(),
-        getUsage(1), // Today's usage only
+        getUsage(1),
         getAllForecasts(),
         getUnmapped(),
         getActivity(20),
         getTodayBatches(),
       ]);
 
+      const updates = {};
+
       if (h.status  === 'fulfilled') setHealth(h.value);
       if (i.status  === 'fulfilled') {
         const invData = i.value || [];
         setInventory(invData);
-        setCounters((prev) => ({
-          ...prev,
-          alerts: invData.filter((i) => i.alert).length,
-        }));
+        updates.alerts = invData.filter((item) => item.alert).length;
       }
-      
       if (uAll.status === 'fulfilled') {
-        setUsage(uAll.value);
-        // Tracked total based on all usage
-        const total = Object.values(uAll.value?.total_usage || {}).reduce((a, b) => a + b, 0);
-        setCounters((prev) => ({ ...prev, totalTracked: Math.round(total * 10) / 10 }));
+        setUsage(uAll.value || { total_usage: {}, by_chef: {} });
+        const total = Object.values(uAll.value?.total_usage || {}).reduce((a, b) => a + Number(b || 0), 0);
+        updates.totalTracked = Math.round(total * 10) / 10;
       }
-
       if (uToday.status === 'fulfilled') {
-        const todayTotal = Object.values(uToday.value?.total_usage || {}).reduce((a, b) => a + b, 0);
-        setCounters((prev) => ({ ...prev, todayUsed: todayTotal }));
+        const todayTotal = Object.values(uToday.value?.total_usage || {}).reduce((a, b) => a + Number(b || 0), 0);
+        updates.todayUsed = todayTotal;
       }
-
       if (fc.status === 'fulfilled') setForecasts(fc.value || []);
       if (um.status === 'fulfilled') {
         const umData = um.value || [];
         setUnmapped(umData);
-        setCounters((prev) => ({ ...prev, unmappedCount: umData.length }));
+        updates.unmappedCount = umData.length;
       }
       if (act.status === 'fulfilled') {
         setActivity(act.value || []);
         setPendingEntries([]);
       }
-      if (todayBatches.status === 'fulfilled') {
-        const batchData = todayBatches.value || [];
+      if (batches.status === 'fulfilled') {
+        const batchData = batches.value || [];
         setTodayBatches(batchData);
-        const purchased = batchData.reduce((acc, b) => acc + b.purchased_quantity, 0);
-        setCounters((prev) => ({ ...prev, todayPurchased: purchased }));
+        updates.todayPurchased = batchData.reduce((acc, b) => acc + Number(b.purchased_quantity || 0), 0);
       }
+
+      setCounters((prev) => ({ ...prev, ...updates }));
+
     } catch (err) {
       setError(err?.message || 'Failed to load dashboard data');
     } finally {
@@ -97,16 +93,13 @@ export function DashboardProvider({ children }) {
     }
   }, []);
 
-  // Initial load
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
-  // Polling every 30s
   useEffect(() => {
     pollTimer.current = setInterval(() => fetchAll({ silent: true }), POLL_INTERVAL);
     return () => clearInterval(pollTimer.current);
   }, [fetchAll]);
 
-  // ── Optimistic helpers ─────────────────────────────────────────────────
   const optimisticIncrement = useCallback((key, amount = 1) => {
     setCounters((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + amount) }));
   }, []);

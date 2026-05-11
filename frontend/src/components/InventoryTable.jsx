@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  AlertTriangle, Check, Edit2, Plus, X, 
+import {
+  AlertTriangle, Check, Edit2, Plus, X,
   ChevronUp, ChevronDown, Search, Filter, ArrowRight,
   TrendingDown, ShoppingBag, Settings2, PackageCheck
 } from 'lucide-react';
 
 function RestockRow({ item, onRestock, onClose }) {
-  const [qty, setQty]   = useState('');
+  const [qty, setQty] = useState('');
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
@@ -64,16 +64,16 @@ function RestockRow({ item, onRestock, onClose }) {
 }
 
 function EditRow({ item, onUpdate, onClose }) {
-  const [val,  setVal]  = useState(String(item.current_stock));
-  const [thr,  setThr]  = useState(String(item.reorder_threshold));
+  const [val, setVal] = useState(String(item.current_stock));
+  const [thr, setThr] = useState(String(item.reorder_threshold));
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
     setBusy(true);
     try {
       await onUpdate({
-        ingredient_name:   item.ingredient,
-        set_absolute:      parseFloat(val),
+        ingredient_name: item.ingredient,
+        set_absolute: parseFloat(val),
         reorder_threshold: parseFloat(thr),
       });
       onClose();
@@ -95,7 +95,7 @@ function EditRow({ item, onUpdate, onClose }) {
             <span className="text-[10px] font-black text-luxury-text-muted uppercase tracking-[0.2em]">Operational Audit</span>
             <span className="text-base text-luxury-text-primary font-bold">Adjusting master record for <span className="text-luxury-text-primary underline decoration-luxury-gold/30 capitalize">{item.ingredient}</span></span>
           </div>
-          
+
           <div className="flex items-center gap-8 ml-auto">
             <div className="space-y-3">
               <label className="text-[10px] font-black text-luxury-gold uppercase tracking-widest ml-1">Current Stock</label>
@@ -170,17 +170,16 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
             className="input-premium pl-14 h-14 text-sm font-medium shadow-sm bg-white/50"
           />
         </div>
-        
+
         <div className="flex items-center gap-4 p-2 rounded-3xl bg-white/60 border border-luxury-border shadow-premium">
           {['ALL', 'CRITICAL', 'WARNING'].map((status) => (
-            <button 
+            <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`px-8 py-3 text-[11px] font-black rounded-2xl transition-all uppercase tracking-[0.2em] ${
-                filterStatus === status 
-                  ? 'bg-luxury-gold text-white shadow-gold' 
+              className={`px-8 py-3 text-[11px] font-black rounded-2xl transition-all uppercase tracking-[0.2em] ${filterStatus === status
+                  ? 'bg-luxury-gold text-white shadow-gold'
                   : 'text-luxury-text-muted hover:text-luxury-text-primary hover:bg-luxury-gold/5'
-              }`}
+                }`}
             >
               {status}
             </button>
@@ -194,11 +193,11 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
             <tr className="data-table-header">
               <th className="px-10 py-6 cursor-pointer group" onClick={() => toggleSort('ingredient')}>
                 <div className="flex items-center gap-3 group-hover:text-luxury-gold transition-colors">
-                   Ingredient Identity 
-                   <div className="flex flex-col opacity-20 group-hover:opacity-100 transition-opacity">
-                      <ChevronUp size={12} className={sortKey === 'ingredient' && sortDir === 'asc' ? 'text-luxury-gold opacity-100' : ''} />
-                      <ChevronDown size={12} className={sortKey === 'ingredient' && sortDir === 'desc' ? 'text-luxury-gold opacity-100' : ''} />
-                   </div>
+                  Ingredient Identity
+                  <div className="flex flex-col opacity-20 group-hover:opacity-100 transition-opacity">
+                    <ChevronUp size={12} className={sortKey === 'ingredient' && sortDir === 'asc' ? 'text-luxury-gold opacity-100' : ''} />
+                    <ChevronDown size={12} className={sortKey === 'ingredient' && sortDir === 'desc' ? 'text-luxury-gold opacity-100' : ''} />
+                  </div>
                 </div>
               </th>
               <th className="px-10 py-6">Opening Vol</th>
@@ -213,7 +212,7 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
             <AnimatePresence mode="popLayout">
               {sorted.map((item, i) => {
                 const isActive = activeRow?.name === item.ingredient;
-                const pct = item.opening_stock > 0 
+                const pct = item.opening_stock > 0
                   ? Math.max(0, Math.min(100, (item.current_stock / item.opening_stock) * 100))
                   : (item.current_stock > 0 ? 100 : 0);
 
@@ -233,10 +232,10 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
                       </td>
 
                       <td className="px-10 py-8">
-                         <div className="flex flex-col gap-1">
-                            <span className="font-black text-luxury-text-primary/70 text-base tabular-nums">{item.opening_stock.toFixed(1)}</span>
-                            <span className="text-[10px] font-black text-luxury-text-muted uppercase tracking-widest">{item.unit}</span>
-                         </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-black text-luxury-text-primary/70 text-base tabular-nums">{item.opening_stock.toFixed(1)}</span>
+                          <span className="text-[10px] font-black text-luxury-text-muted uppercase tracking-widest">{item.unit}</span>
+                        </div>
                       </td>
 
                       <td className="px-10 py-8">
@@ -250,9 +249,8 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
                       <td className="px-10 py-8">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-baseline gap-2">
-                            <span className={`text-2xl font-black tabular-nums tracking-tighter ${
-                              item.status === 'CRITICAL' ? 'text-status-danger' : item.status === 'WARNING' ? 'text-status-warning' : 'text-luxury-text-primary'
-                            }`}>
+                            <span className={`text-2xl font-black tabular-nums tracking-tighter ${item.status === 'CRITICAL' ? 'text-status-danger' : item.status === 'WARNING' ? 'text-status-warning' : 'text-luxury-text-primary'
+                              }`}>
                               {item.current_stock.toFixed(1)}
                             </span>
                             <span className="text-[11px] font-black text-luxury-text-muted uppercase tracking-widest">{item.unit}</span>
@@ -263,21 +261,19 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
                       <td className="px-10 py-8">
                         <div className="w-40 space-y-3">
                           <div className="flex justify-between items-end">
-                             <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${
-                               item.status === 'CRITICAL' ? 'text-status-danger' : item.status === 'WARNING' ? 'text-status-warning' : 'text-status-success'
-                             }`}>
-                               {item.status}
-                             </span>
-                             <span className="text-[10px] font-black text-luxury-text-muted tracking-widest">{Math.round(pct)}%</span>
+                            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${item.status === 'CRITICAL' ? 'text-status-danger' : item.status === 'WARNING' ? 'text-status-warning' : 'text-status-success'
+                              }`}>
+                              {item.status}
+                            </span>
+                            <span className="text-[10px] font-black text-luxury-text-muted tracking-widest">{Math.round(pct)}%</span>
                           </div>
                           <div className="h-2 w-full bg-luxury-cream rounded-full overflow-hidden border border-luxury-border shadow-inner">
-                            <motion.div 
+                            <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${pct}%` }}
                               transition={{ duration: 1, ease: "easeOut" }}
-                              className={`h-full rounded-full ${
-                                item.status === 'CRITICAL' ? 'bg-status-danger shadow-sm' : item.status === 'WARNING' ? 'bg-status-warning' : 'bg-status-success shadow-sm'
-                              }`}
+                              className={`h-full rounded-full ${item.status === 'CRITICAL' ? 'bg-status-danger shadow-sm' : item.status === 'WARNING' ? 'bg-status-warning' : 'bg-status-success shadow-sm'
+                                }`}
                             />
                           </div>
                         </div>
@@ -285,24 +281,22 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
 
                       <td className="px-10 py-8 text-right">
                         <div className="flex items-center justify-end gap-4">
-                          <button 
+                          <button
                             onClick={() => openRow(item.ingredient, 'restock')}
-                            className={`w-12 h-12 rounded-[18px] border-2 flex items-center justify-center transition-all shadow-sm ${
-                              isActive && activeRow?.mode === 'restock' 
-                                ? 'bg-luxury-gold border-luxury-gold text-white shadow-gold' 
+                            className={`w-12 h-12 rounded-[18px] border-2 flex items-center justify-center transition-all shadow-sm ${isActive && activeRow?.mode === 'restock'
+                                ? 'bg-luxury-gold border-luxury-gold text-white shadow-gold'
                                 : 'border-luxury-border text-luxury-text-muted hover:border-luxury-gold/50 hover:text-luxury-gold hover:bg-white'
-                            }`}
+                              }`}
                             title="Register Purchase"
                           >
                             <ShoppingBag size={20} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => openRow(item.ingredient, 'edit')}
-                            className={`w-12 h-12 rounded-[18px] border-2 flex items-center justify-center transition-all shadow-sm ${
-                              isActive && activeRow?.mode === 'edit' 
-                                ? 'bg-luxury-text-primary border-luxury-text-primary text-white shadow-lg' 
+                            className={`w-12 h-12 rounded-[18px] border-2 flex items-center justify-center transition-all shadow-sm ${isActive && activeRow?.mode === 'edit'
+                                ? 'bg-luxury-text-primary border-luxury-text-primary text-white shadow-lg'
                                 : 'border-luxury-border text-luxury-text-muted hover:border-luxury-text-primary/30 hover:text-luxury-text-primary hover:bg-white'
-                            }`}
+                              }`}
                             title="Audit Record"
                           >
                             <Settings2 size={20} />
@@ -326,15 +320,15 @@ export function InventoryTable({ items = [], onUpdate, onRestock, theme = 'warm'
             </AnimatePresence>
           </tbody>
         </table>
-        
+
         {sorted.length === 0 && (
           <div className="py-32 flex flex-col items-center justify-center gap-10 text-luxury-text-muted/20">
             <div className="w-24 h-24 rounded-[40px] bg-luxury-cream border border-luxury-border flex items-center justify-center shadow-premium">
-               <PackageCheck size={48} className="text-luxury-text-muted/30" />
+              <PackageCheck size={48} className="text-luxury-text-muted/30" />
             </div>
             <div className="text-center space-y-3">
-               <p className="text-xl font-black text-luxury-text-primary uppercase tracking-tight">No Catalog Matches</p>
-               <p className="text-sm font-medium max-w-sm mx-auto text-luxury-text-secondary">We couldn't find any ingredients matching your current filtration criteria.</p>
+              <p className="text-xl font-black text-luxury-text-primary uppercase tracking-tight">No Catalog Matches</p>
+              <p className="text-sm font-medium max-w-sm mx-auto text-luxury-text-secondary">We couldn't find any ingredients matching your current filtration criteria.</p>
             </div>
             <button onClick={() => { setSearch(''); setFilterStatus('ALL'); }} className="btn-secondary h-14 px-10 text-[11px] uppercase tracking-[0.2em] font-black border-dashed">
               Reset Operational Filters

@@ -155,6 +155,10 @@ def create_entry(payload: StockEntryRequest) -> StockEntryResponse:
         if session:
             rollback_and_log(session, "HTTPException in create_entry")
         raise
+    except ValueError as exc:
+        if session:
+            rollback_and_log(session, f"Insufficient stock error: {str(exc)}")
+        raise HTTPException(status_code=422, detail=str(exc))
     except SQLAlchemyError as exc:
         if session:
             rollback_and_log(session, "SQLAlchemyError in create_entry")

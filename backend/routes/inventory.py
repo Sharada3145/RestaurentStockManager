@@ -95,8 +95,8 @@ def get_inventory():
                 DailyStockBatch.batch_date >= today_start
             ).scalar() or 0.0
 
-            # Opening stock for today
-            opening_stock = inv.current_stock + used_today - purchased_today
+            # Opening stock for today (clamped to never be negative)
+            opening_stock = max(0.0, inv.current_stock + used_today - purchased_today)
 
             # Determine status
             # Using opening_stock as the reference for percentage if possible, else reorder_threshold
@@ -184,15 +184,31 @@ def update_inventory(payload: InventoryUpdateRequest):
             if not ing:
                 raise HTTPException(status_code=404, detail=f"Ingredient '{payload.ingredient_name}' not found")
 
+            inv = session.query(Inventory).filter_by(ingredient_id=ing.id).first()
+            prev_stock = inv.current_stock if inv else 0.0
+
             if payload.set_absolute is not None:
                 set_stock(session, ing.id, payload.set_absolute, payload.unit)
             elif payload.change is not None:
                 adjust_stock(session, ing.id, payload.change, payload.unit)
 
             if payload.reorder_threshold is not None:
-                inv = session.query(Inventory).filter_by(ingredient_id=ing.id).first()
                 if inv:
                     inv.reorder_threshold = payload.reorder_threshold
+
+            # Log as batch if stock increased
+            new_stock = inv.current_stock if inv else 0.0
+            if new_stock > prev_stock:
+                from backend.models import DailyStockBatch
+                added = new_stock - prev_stock
+                batch = DailyStockBatch(
+                    ingredient_id=ing.id,
+                    purchased_quantity=added,
+                    remaining_quantity=added,
+                    unit=inv.unit if inv else ing.default_unit,
+                    batch_date=datetime.utcnow()
+                )
+                session.add(batch)
 
         # After commit, we need a fresh query or refresh if we want to return the updated object
         # since it was committed and potentially expired.
@@ -256,6 +272,17 @@ def restock_ingredient(payload: RestockRequest):
                 )
 
             result = adjust_stock(session, ing.id, payload.quantity, payload.unit)
+
+            # Record this as a daily batch for KPIs
+            from backend.models import DailyStockBatch
+            new_batch = DailyStockBatch(
+                ingredient_id=ing.id,
+                purchased_quantity=payload.quantity,
+                remaining_quantity=payload.quantity,
+                unit=payload.unit or ing.default_unit,
+                batch_date=datetime.utcnow()
+            )
+            session.add(new_batch)
 
         # Re-fetch after commit
         ing = session.query(Ingredient).filter_by(id=ing.id).first()

@@ -1,14 +1,15 @@
 import { useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar } from './components/Sidebar';
-import { Toast }   from './components/Toast';
-import { DashboardPage }   from './pages/DashboardPage';
-import { StockEntryPage }  from './pages/StockEntryPage';
-import { InventoryPage }   from './pages/InventoryPage';
-import { UnmappedPage }    from './pages/UnmappedPage';
-import { ForecastsPage }   from './pages/ForecastsPage';
-import { AnalyticsPage }   from './pages/AnalyticsPage';
+import { Toast } from './components/Toast';
+import { DashboardPage } from './pages/DashboardPage';
+import { StockEntryPage } from './pages/StockEntryPage';
+import { InventoryPage } from './pages/InventoryPage';
+import { UnmappedPage } from './pages/UnmappedPage';
+import { ForecastsPage } from './pages/ForecastsPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 import { IngredientsPage } from './pages/IngredientsPage';
+import { ChefUsageOverview } from './pages/ChefUsageOverview';
 import { useDashboard }    from './context/DashboardContext';
 import { RefreshCw, Calendar, User, Bell, ChevronRight } from 'lucide-react';
 import {
@@ -20,25 +21,26 @@ import {
 } from './services/api';
 
 const PAGE_TITLES = {
-  dashboard:   'Kitchen Operations',
-  entry:       'Stock Intake',
-  inventory:   'Inventory Management',
-  forecasts:   'Usage Predictions',
-  analytics:   'Performance Analytics',
-  unmapped:    'Review Queue',
+  dashboard: 'Kitchen Operations',
+  entry: 'Stock Intake',
+  inventory: 'Inventory Management',
+  team: 'Chef Usage Overview',
+  forecasts: 'Usage Predictions',
+  analytics: 'Performance Analytics',
+  unmapped: 'Review Queue',
   ingredients: 'Ingredient Catalogue',
 };
 
 export default function App() {
-  const [page, setPage]     = useState('dashboard');
+  const [page, setPage] = useState('dashboard');
   const [toasts, setToasts] = useState([]);
 
   const { refreshDashboard, addPendingEntry, optimisticIncrement, health } = useDashboard();
 
   const currentDate = useMemo(() => {
-    return new Intl.DateTimeFormat('en-US', { 
-      weekday: 'long', 
-      month: 'long', 
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      month: 'long',
       day: 'numeric',
       year: 'numeric'
     }).format(new Date());
@@ -59,7 +61,7 @@ export default function App() {
   const handleSubmitEntry = useCallback(async (payload) => {
     try {
       const data = await postEntry(payload);
-      const mapped   = data.results.filter((r) => r.status === 'mapped').length;
+      const mapped = data.results.filter((r) => r.status === 'mapped').length;
       const unmapped = data.results.filter((r) => r.status === 'unmapped').length;
       notify(`✅ ${mapped} item${mapped !== 1 ? 's' : ''} logged${unmapped ? `, ${unmapped} unmapped` : ''}`);
       addPendingEntry(data.results.map((r) => ({ ...r, chef_name: payload.chef_name })));
@@ -124,11 +126,13 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case 'dashboard':
-        return <DashboardPage onRefresh={refreshDashboard} notify={notify} />;
+        return <DashboardPage onRefresh={refreshDashboard} notify={notify} onNavigate={setPage} onRestock={handleRestock} />;
       case 'entry':
         return <StockEntryPage onSubmit={handleSubmitEntry} notify={notify} />;
       case 'inventory':
         return <InventoryPage onUpdate={handleUpdateInventory} onRestock={handleRestock} />;
+      case 'team':
+        return <ChefUsageOverview />;
       case 'forecasts':
         return <ForecastsPage />;
       case 'analytics':
@@ -149,52 +153,52 @@ export default function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        
+
         {/* Decorative Top Background Accent */}
         <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-luxury-gold/5 to-transparent pointer-events-none" />
 
         {/* Top Header */}
         <header className="h-24 shrink-0 border-b border-luxury-border bg-white/40 backdrop-blur-2xl flex items-center justify-between px-10 z-10">
           <div className="flex items-center gap-8">
-             <div className="hidden lg:flex items-center gap-3 text-luxury-text-muted">
-                <Calendar size={18} className="text-luxury-gold" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{currentDate}</span>
-             </div>
-             <div className="h-6 w-px bg-luxury-border hidden lg:block" />
-             <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-luxury-gold uppercase tracking-[0.3em]">StockIQ</span>
-                <ChevronRight size={14} className="text-luxury-border" />
-                <h2 className="text-sm font-black text-luxury-text-primary uppercase tracking-[0.2em]">
-                   {PAGE_TITLES[page]}
-                </h2>
-             </div>
+            <div className="hidden lg:flex items-center gap-3 text-luxury-text-muted">
+              <Calendar size={18} className="text-luxury-gold" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{currentDate}</span>
+            </div>
+            <div className="h-6 w-px bg-luxury-border hidden lg:block" />
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black text-luxury-gold uppercase tracking-[0.3em]">StockIQ</span>
+              <ChevronRight size={14} className="text-luxury-border" />
+              <h2 className="text-sm font-black text-luxury-text-primary uppercase tracking-[0.2em]">
+                {PAGE_TITLES[page]}
+              </h2>
+            </div>
           </div>
 
           <div className="flex items-center gap-6">
-             <button 
-                onClick={() => refreshDashboard()}
-                className="p-3 rounded-2xl bg-white/60 border border-luxury-border text-luxury-text-muted hover:text-luxury-gold hover:border-luxury-gold/30 transition-all active:scale-95 shadow-sm"
-                title="Refresh Intelligence"
-             >
-                <RefreshCw size={20} />
-             </button>
-             
-             <div className="h-8 w-px bg-luxury-border" />
+            <button
+              onClick={() => refreshDashboard()}
+              className="p-3 rounded-2xl bg-white/60 border border-luxury-border text-luxury-text-muted hover:text-luxury-gold hover:border-luxury-gold/30 transition-all active:scale-95 shadow-sm"
+              title="Refresh Intelligence"
+            >
+              <RefreshCw size={20} />
+            </button>
 
-             <div className="flex items-center gap-4 pl-2">
-                <div className="text-right hidden sm:block">
-                   <p className="text-xs font-black text-luxury-text-primary uppercase tracking-tighter">Executive Chef</p>
-                   <div className="flex items-center justify-end gap-2">
-                      <div className={`w-2 h-2 rounded-full ${health?.status === 'ok' ? 'bg-status-success' : 'bg-status-danger'}`} />
-                      <p className="text-[10px] font-bold text-luxury-text-muted uppercase tracking-widest">Verified Console</p>
-                   </div>
+            <div className="h-8 w-px bg-luxury-border" />
+
+            <div className="flex items-center gap-4 pl-2">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-black text-luxury-text-primary uppercase tracking-tighter">Executive Chef</p>
+                <div className="flex items-center justify-end gap-2">
+                  <div className={`w-2 h-2 rounded-full ${health?.status === 'ok' ? 'bg-status-success' : 'bg-status-danger'}`} />
+                  <p className="text-[10px] font-bold text-luxury-text-muted uppercase tracking-widest">Verified Console</p>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-luxury-gradient p-0.5 shadow-gold hover:scale-105 transition-transform cursor-pointer">
-                   <div className="w-full h-full rounded-[14px] bg-white flex items-center justify-center">
-                      <User size={22} className="text-luxury-gold" />
-                   </div>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-luxury-gradient p-0.5 shadow-gold hover:scale-105 transition-transform cursor-pointer">
+                <div className="w-full h-full rounded-[14px] bg-white flex items-center justify-center">
+                  <User size={22} className="text-luxury-gold" />
                 </div>
-             </div>
+              </div>
+            </div>
           </div>
         </header>
 
