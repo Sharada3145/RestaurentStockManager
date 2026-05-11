@@ -25,6 +25,13 @@
   ::-webkit-scrollbar-thumb:hover { @apply bg-luxury-gold/40; }
 
   ::selection { @apply bg-luxury-gold/20 text-luxury-text-primary; }
+
+  /* Mobile Touch Optimizations */
+  @media (max-width: 768px) {
+    input, select, button {
+      font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    }
+  }
 }
 
 /* ── Design System ────────────────────────────────────────────────────────── */

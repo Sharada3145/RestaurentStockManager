@@ -199,7 +199,7 @@ export function DashboardPage(props) {
             </div>
           </div>
 
-          <div className="h-[360px]">
+          <div className="h-[280px] sm:h-[360px]">
             {totalUsageData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={totalUsageData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -247,7 +247,7 @@ export function DashboardPage(props) {
             </div>
           </div>
 
-          <div className="h-[360px]">
+          <div className="h-[280px] sm:h-[360px]">
             <PredictionChart forecast={topForecast} ingredient={topIngr} premium warm />
           </div>
         </div>

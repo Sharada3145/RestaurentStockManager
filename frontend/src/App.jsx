@@ -11,7 +11,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { IngredientsPage } from './pages/IngredientsPage';
 import { ChefUsageOverview } from './pages/ChefUsageOverview';
 import { useDashboard }    from './context/DashboardContext';
-import { RefreshCw, Calendar, User, Bell, ChevronRight } from 'lucide-react';
+import { RefreshCw, Calendar, User, Bell, ChevronRight, Menu } from 'lucide-react';
 import {
   postEntry,
   postInventory,
@@ -21,14 +21,14 @@ import {
 } from './services/api';
 
 const PAGE_TITLES = {
-  dashboard: 'Kitchen Operations',
+  dashboard: 'Operations',
   entry: 'Stock Intake',
-  inventory: 'Inventory Management',
-  team: 'Chef Usage Overview',
-  forecasts: 'Usage Predictions',
-  analytics: 'Performance Analytics',
-  unmapped: 'Review Queue',
-  ingredients: 'Ingredient Catalogue',
+  inventory: 'Inventory',
+  team: 'Chef Usage',
+  forecasts: 'Predictions',
+  analytics: 'Analytics',
+  unmapped: 'Review',
+  ingredients: 'Catalogue',
 };
 
 export default function App() {
@@ -39,10 +39,9 @@ export default function App() {
 
   const currentDate = useMemo(() => {
     return new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
     }).format(new Date());
   }, []);
 
@@ -77,7 +76,7 @@ export default function App() {
   const handleUpdateInventory = useCallback(async (payload) => {
     try {
       const data = await postInventory(payload);
-      notify(`📦 ${data.ingredient} updated to ${data.current_stock.toFixed(2)} ${data.unit}`);
+      notify(`📦 ${data.ingredient} updated`);
       refreshDashboard({ silent: true });
       return data;
     } catch (err) {
@@ -89,7 +88,7 @@ export default function App() {
   const handleRestock = useCallback(async (payload) => {
     try {
       const data = await postRestock(payload);
-      notify(`🔄 Restocked ${data.ingredient}: +${payload.quantity} ${data.unit}`);
+      notify(`🔄 Restocked ${data.ingredient}`);
       refreshDashboard({ silent: true });
       return data;
     } catch (err) {
@@ -101,7 +100,7 @@ export default function App() {
   const handleMapUnmapped = useCallback(async (unmappedId, ingredientName) => {
     try {
       await postMap(unmappedId, ingredientName);
-      notify(`🧠 Mapped & model retrained → ${ingredientName}`);
+      notify(`🧠 Mapped → ${ingredientName}`);
       optimisticIncrement('unmappedCount', -1);
       refreshDashboard({ silent: true });
     } catch (err) {
@@ -113,20 +112,19 @@ export default function App() {
   const handleAddIngredient = useCallback(async (payload) => {
     try {
       const data = await postIngredient(payload);
-      notify(`🌿 Added ingredient: ${data.name}`);
+      notify(`🌿 Added: ${data.name}`);
       refreshDashboard({ silent: true });
       return data;
     } catch (err) {
-      notify(err?.response?.data?.detail || 'Failed to add ingredient', 'error');
+      notify(err?.response?.data?.detail || 'Failed to add', 'error');
       throw err;
     }
   }, [notify, refreshDashboard]);
 
-  // ── Page renderer ─────────────────────────────────────────────────────────
   const renderPage = () => {
     switch (page) {
       case 'dashboard':
-        return <DashboardPage onRefresh={refreshDashboard} notify={notify} onNavigate={setPage} onRestock={handleRestock} />;
+        return <DashboardPage onRefresh={refreshDashboard} notify={notify} onNavigate={setPage} onRestock={handleRestock} onUpdate={handleUpdateInventory} />;
       case 'entry':
         return <StockEntryPage onSubmit={handleSubmitEntry} notify={notify} />;
       case 'inventory':
@@ -142,76 +140,73 @@ export default function App() {
       case 'ingredients':
         return <IngredientsPage onAdd={handleAddIngredient} />;
       default:
-        return <DashboardPage onRefresh={refreshDashboard} notify={notify} />;
+        return <DashboardPage onRefresh={refreshDashboard} notify={notify} onNavigate={setPage} onRestock={handleRestock} onUpdate={handleUpdateInventory} />;
     }
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-luxury-cream text-luxury-text-primary">
-      {/* Sidebar */}
+    <div className="flex flex-col xl:flex-row h-screen overflow-hidden bg-luxury-cream text-luxury-text-primary">
       <Sidebar activePage={page} onNavigate={setPage} />
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
+        <div className="absolute top-0 left-0 right-0 h-48 xl:h-96 bg-gradient-to-b from-luxury-gold/5 to-transparent pointer-events-none" />
 
-        {/* Decorative Top Background Accent */}
-        <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-luxury-gold/5 to-transparent pointer-events-none" />
-
-        {/* Top Header */}
-        <header className="h-24 shrink-0 border-b border-luxury-border bg-white/40 backdrop-blur-2xl flex items-center justify-between px-10 z-10">
-          <div className="flex items-center gap-8">
-            <div className="hidden lg:flex items-center gap-3 text-luxury-text-muted">
+        <header className="h-20 xl:h-24 shrink-0 border-b border-luxury-border bg-white/40 backdrop-blur-2xl flex items-center justify-between px-6 xl:px-10 z-10">
+          <div className="flex items-center gap-4 xl:gap-8">
+            <div className="flex xl:hidden items-center justify-center w-10 h-10 rounded-xl bg-luxury-gradient shadow-gold text-white">
+              <RefreshCw size={18} onClick={() => refreshDashboard()} />
+            </div>
+            
+            <div className="hidden xl:flex items-center gap-3 text-luxury-text-muted">
               <Calendar size={18} className="text-luxury-gold" />
               <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{currentDate}</span>
             </div>
-            <div className="h-6 w-px bg-luxury-border hidden lg:block" />
+            <div className="h-6 w-px bg-luxury-border hidden xl:block" />
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black text-luxury-gold uppercase tracking-[0.3em]">StockIQ</span>
-              <ChevronRight size={14} className="text-luxury-border" />
+              <span className="text-[10px] font-black text-luxury-gold uppercase tracking-[0.3em] hidden sm:inline">StockIQ</span>
+              <ChevronRight size={14} className="text-luxury-border hidden sm:inline" />
               <h2 className="text-sm font-black text-luxury-text-primary uppercase tracking-[0.2em]">
                 {PAGE_TITLES[page]}
               </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 xl:gap-6">
             <button
               onClick={() => refreshDashboard()}
-              className="p-3 rounded-2xl bg-white/60 border border-luxury-border text-luxury-text-muted hover:text-luxury-gold hover:border-luxury-gold/30 transition-all active:scale-95 shadow-sm"
-              title="Refresh Intelligence"
+              className="hidden xl:flex p-3 rounded-2xl bg-white/60 border border-luxury-border text-luxury-text-muted hover:text-luxury-gold hover:border-luxury-gold/30 transition-all active:scale-95 shadow-sm"
             >
               <RefreshCw size={20} />
             </button>
 
-            <div className="h-8 w-px bg-luxury-border" />
+            <div className="hidden xl:block h-8 w-px bg-luxury-border" />
 
-            <div className="flex items-center gap-4 pl-2">
+            <div className="flex items-center gap-3 xl:gap-4 pl-0 xl:pl-2">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-black text-luxury-text-primary uppercase tracking-tighter">Executive Chef</p>
-                <div className="flex items-center justify-end gap-2">
-                  <div className={`w-2 h-2 rounded-full ${health?.status === 'ok' ? 'bg-status-success' : 'bg-status-danger'}`} />
-                  <p className="text-[10px] font-bold text-luxury-text-muted uppercase tracking-widest">Verified Console</p>
+                <p className="text-[10px] xl:text-xs font-black text-luxury-text-primary uppercase tracking-tighter">Executive Chef</p>
+                <div className="flex items-center justify-end gap-1.5 xl:gap-2">
+                  <div className={`w-1.5 h-1.5 xl:w-2 xl:h-2 rounded-full ${health?.status === 'ok' ? 'bg-status-success' : 'bg-status-danger'}`} />
+                  <p className="text-[8px] xl:text-[10px] font-bold text-luxury-text-muted uppercase tracking-widest">Verified</p>
                 </div>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-luxury-gradient p-0.5 shadow-gold hover:scale-105 transition-transform cursor-pointer">
-                <div className="w-full h-full rounded-[14px] bg-white flex items-center justify-center">
-                  <User size={22} className="text-luxury-gold" />
+              <div className="w-10 h-10 xl:w-12 xl:h-12 rounded-xl xl:rounded-2xl bg-luxury-gradient p-0.5 shadow-gold hover:scale-105 transition-transform cursor-pointer">
+                <div className="w-full h-full rounded-[10px] xl:rounded-[14px] bg-white flex items-center justify-center">
+                  <User size={18} className="text-luxury-gold" />
                 </div>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto custom-scrollbar relative z-0">
-          <div className="mx-auto max-w-[1400px] px-10 py-12">
+        <main className="flex-1 overflow-y-auto custom-scrollbar relative z-0 pb-24 xl:pb-12">
+          <div className="mx-auto max-w-[1400px] px-6 xl:px-10 py-8 xl:py-12">
             <AnimatePresence mode="wait">
               <motion.div
                 key={page}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
               >
                 {renderPage()}
               </motion.div>
@@ -220,8 +215,7 @@ export default function App() {
         </main>
       </div>
 
-      {/* Toast notifications */}
-      <div className="fixed bottom-10 right-10 z-50 flex flex-col gap-4 pointer-events-none">
+      <div className="fixed bottom-24 xl:bottom-10 right-6 xl:right-10 z-50 flex flex-col gap-4 pointer-events-none">
         <AnimatePresence>
           {toasts.map((t) => (
             <Toast
