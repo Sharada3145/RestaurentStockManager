@@ -1,29 +1,39 @@
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, ClipboardList, Package, TrendingUp,
   BarChart2, ScanSearch, Layers, ChefHat, Zap,
-  Activity, Settings, HelpCircle, Sparkles, ShieldCheck, User, History
+  Activity, ShieldCheck, Sparkles, LogOut, History
 } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
+import { useAuth } from '../context/AuthContext';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Operations', icon: LayoutDashboard },
-  { id: 'entry', label: 'Intake', icon: ClipboardList },
-  { id: 'inventory', label: 'Stock', icon: Package },
-  { id: 'team', label: 'Chef', icon: History },
-  { id: 'forecasts', label: 'AI', icon: TrendingUp },
-  { id: 'analytics', label: 'Data', icon: BarChart2 },
-  { id: 'unmapped', label: 'Review', icon: ScanSearch },
-  { id: 'ingredients', label: 'Catalog', icon: Layers },
+  { id: 'dashboard', path: '/', label: 'Operations', icon: LayoutDashboard },
+  { id: 'entry', path: '/entry', label: 'Intake', icon: ClipboardList },
+  { id: 'inventory', path: '/inventory', label: 'Stock', icon: Package },
+  { id: 'team', path: '/team', label: 'Chef', icon: History },
+  { id: 'forecasts', path: '/forecasts', label: 'AI', icon: TrendingUp },
+  { id: 'analytics', path: '/analytics', label: 'Data', icon: BarChart2 },
+  { id: 'unmapped', path: '/unmapped', label: 'Review', icon: ScanSearch },
+  { id: 'ingredients', path: '/ingredients', label: 'Catalog', icon: Layers },
 ];
 
-export function Sidebar({ activePage, onNavigate }) {
+export function Sidebar({ activePage }) {
   const { counters, health } = useDashboard();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const badge = (id) => {
     if (id === 'unmapped' && counters.unmappedCount > 0) return counters.unmappedCount;
     if (id === 'inventory' && counters.alerts > 0) return counters.alerts;
     return null;
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -53,13 +63,13 @@ export function Sidebar({ activePage, onNavigate }) {
         {/* Navigation */}
         <nav className="flex-1 px-5 py-6 space-y-3 overflow-y-auto custom-scrollbar">
           {NAV_ITEMS.map((item) => {
-            const isActive = activePage === item.id;
+            const isActive = location.pathname === item.path;
             const count = badge(item.id);
             return (
               <button
                 key={item.id}
-                onClick={() => onNavigate(item.id)}
-                className={`nav-item group flex items-center gap-5 py-4.5 px-8 relative overflow-hidden transition-all duration-500 ${isActive ? 'nav-item-active shadow-premium' : 'hover:translate-x-1'}`}
+                onClick={() => navigate(item.path)}
+                className={`nav-item group w-full flex items-center gap-5 py-4.5 px-8 relative overflow-hidden transition-all duration-500 ${isActive ? 'nav-item-active shadow-premium' : 'hover:translate-x-1'}`}
               >
                 {isActive && (
                   <motion.div
@@ -87,8 +97,9 @@ export function Sidebar({ activePage, onNavigate }) {
           })}
         </nav>
 
-        {/* System Health */}
-        <div className="px-8 py-10">
+        {/* Bottom Section: Health & Logout */}
+        <div className="px-8 py-10 space-y-6">
+          {/* System Health */}
           <div className="flex flex-col gap-6 rounded-[32px] bg-white shadow-premium p-8 border border-luxury-border relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity rotate-6 pointer-events-none">
               <Zap size={64} className="text-luxury-gold" />
@@ -106,30 +117,28 @@ export function Sidebar({ activePage, onNavigate }) {
                 <p className="text-[9px] font-bold text-luxury-text-muted uppercase tracking-widest">Global Sync Active</p>
               </div>
             </div>
-
-            <div className="space-y-4 pt-6 border-t border-luxury-border relative z-10">
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] text-luxury-text-muted font-black uppercase tracking-widest">Assets</span>
-                <span className="text-[10px] text-luxury-text-primary font-black tabular-nums">{health?.ingredient_count || 0}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] text-luxury-text-muted font-black uppercase tracking-widest">Engine</span>
-                <span className="text-[10px] text-luxury-text-primary font-black">v{health?.version || '3.2.0'}</span>
-              </div>
-            </div>
           </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl border border-luxury-border bg-white/50 text-luxury-text-secondary hover:bg-status-danger/5 hover:text-status-danger hover:border-status-danger/20 transition-all duration-300 font-bold text-[10px] uppercase tracking-widest"
+          >
+            <LogOut size={16} />
+            <span>Sign Out Platform</span>
+          </button>
         </div>
       </aside>
 
       {/* Mobile Bottom Navigation */}
       <nav className="xl:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-2xl border-t border-luxury-border px-4 h-20 flex items-center justify-around shadow-2xl safe-area-bottom">
         {NAV_ITEMS.slice(0, 5).map((item) => {
-          const isActive = activePage === item.id;
+          const isActive = location.pathname === item.path;
           const count = badge(item.id);
           return (
             <button
               key={item.id}
-              onClick={() => onNavigate(item.id)}
+              onClick={() => navigate(item.path)}
               className={`flex flex-col items-center justify-center gap-1.5 flex-1 h-full relative transition-all duration-300 ${isActive ? 'text-luxury-gold' : 'text-luxury-text-muted'}`}
             >
               {isActive && (
@@ -148,13 +157,13 @@ export function Sidebar({ activePage, onNavigate }) {
             </button>
           );
         })}
-        {/* Simple More button for overflow items */}
-        <button 
-           onClick={() => onNavigate('analytics')}
+        {/* Mobile Logout (Replacing More) */}
+        <button
+           onClick={handleLogout}
            className={`flex flex-col items-center justify-center gap-1.5 flex-1 h-full text-luxury-text-muted`}
         >
-          <Activity size={20} />
-          <span className="text-[9px] font-black uppercase tracking-widest">Audit</span>
+          <LogOut size={20} />
+          <span className="text-[9px] font-black uppercase tracking-widest">Exit</span>
         </button>
       </nav>
     </>

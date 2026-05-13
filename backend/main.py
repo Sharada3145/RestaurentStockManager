@@ -83,10 +83,12 @@ from backend.routes.analytics    import router as analytics_router
 from backend.routes.prediction   import router as prediction_router
 from backend.routes.ingredients  import router as ingredients_router
 from backend.routes.daily_batches import router as batch_router
+from backend.routes.auth        import router as auth_router
 
 PREFIX = "/api/v1"
 
 app.include_router(health_router,      prefix=PREFIX)
+app.include_router(auth_router,        prefix=PREFIX)
 app.include_router(stock_router,       prefix=PREFIX)
 app.include_router(inventory_router,   prefix=PREFIX)
 app.include_router(analytics_router,   prefix=PREFIX)
