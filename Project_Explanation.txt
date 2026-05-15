@@ -1,0 +1,79 @@
+# Project Explanation: StockIQ - Restaurant Inventory & Intelligence System
+
+## 1. Problem Statement
+The hospitality industry, specifically restaurants, faces significant operational challenges in inventory management:
+- **Food Waste:** Over-ordering leads to perishables spoiling before use.
+- **Stockouts:** Under-ordering results in menu items being unavailable, hurting revenue and customer satisfaction.
+- **Manual Tracking:** Relying on paper or spreadsheets is error-prone, time-consuming, and lacks real-time visibility.
+- **Unpredictable Demand:** Managers often guess how much to order based on "gut feeling" rather than data.
+
+StockIQ was built to bridge this gap by providing a data-driven, automated, and visually intuitive platform to manage kitchen assets.
+
+---
+
+## 2. My Approach to the Problem
+My approach was centered on creating a "Production-Grade" solution rather than just a simple tracker.
+1.  **Architecture:** I chose a decoupled architecture with a high-performance **FastAPI** backend and a modern **React** frontend. This ensures the system is fast, scalable, and easy to maintain.
+2.  **Data Integrity:** I implemented strict database constraints (using SQLAlchemy) to prevent common errors like negative stock levels or orphan catalog items.
+3.  **Intelligence First:** Instead of just recording data, I integrated **Machine Learning** to analyze historical trends and provide "Stock IQ"—predicting future needs.
+4.  **Premium UX:** Recognizing that restaurant environments are high-stress, I designed a "Hospitality-Themed" interface (Gold/Cream/Dark modes) that is clean, responsive, and accessible on both desktop and tablets.
+
+---
+
+## 3. How the Problem was Solved
+The solution provides a centralized "Command Center" for the kitchen:
+- **Centralized Catalog:** All ingredients are standardized with units (grams, kg, liters) and SKU codes.
+- **Live Inventory:** Every action (restock, usage, waste) is logged and updates the live stock count instantly.
+- **Predictive Ordering:** The system looks at historical usage and current stock to suggest exactly what needs to be ordered for the next 7 days.
+- **Accountability:** Role-Based Access Control (RBAC) ensures only authorized staff can perform sensitive actions (like deleting inventory or managing the team).
+
+---
+
+## 4. Tech Stack
+### Frontend (The User Interface)
+- **React (Vite):** A fast, component-based framework for a smooth Single Page Application (SPA).
+- **Tailwind CSS:** For highly customized, premium styling and responsive layouts.
+- **Framer Motion:** Adds subtle micro-animations for a high-end feel.
+- **Recharts:** Used for dynamic data visualization (Usage trends, prediction charts).
+- **Lucide React:** A comprehensive set of modern icons.
+
+### Backend (The Engine)
+- **FastAPI:** A modern, high-performance Python framework for building APIs.
+- **SQLAlchemy:** SQL Toolkit and ORM for robust database management.
+- **SQLite:** A lightweight yet powerful database for local production use.
+- **Pydantic:** Data validation and settings management using Python type annotations.
+- **JWT & Bcrypt:** Secure authentication and password hashing.
+
+### Intelligence & Analytics
+- **Scikit-learn:** For training and serving demand forecasting models.
+- **Pandas:** For complex data manipulation and analytics generation.
+- **Joblib:** For persistence of trained machine learning models.
+
+---
+
+## 5. Key Features
+1.  **Executive Dashboard:** Real-time KPIs showing low stock alerts, weekly usage trends, and recent team activity.
+2.  **Master Catalog Management:** Full CRUD (Create, Read, Update, Delete) for managing every ingredient in the kitchen.
+3.  **Inventory Live-Tracking:** A "Daily Operations" view where staff can quickly log restocks or usage.
+4.  **Demand Forecasting:** An AI-powered page that predicts ingredient consumption for the upcoming week based on historical patterns.
+5.  **Analytics Suite:** Detailed charts showing which ingredients are used most and where waste is occurring.
+6.  **Team Management:** Admin tools to manage staff roles (Admin, Manager, Chef) and secure the platform.
+7.  **Audit Logs:** A complete activity feed of every stock movement for full transparency.
+
+---
+
+## 6. Implementation Detail (Deep Dive)
+
+### Backend Logic
+- **Modular Routes:** The backend is split into logical modules (Auth, Inventory, Ingredients, Prediction, Analytics). Each has its own dedicated logic.
+- **Service Layer:** Business logic (like calculating stock levels or processing batches) is abstracted into service files, keeping the API routes clean.
+- **Forecasting Pipeline:** The ML system extracts historical usage logs, preprocesses the time-series data, trains a regression model, and serves the predictions via an API endpoint.
+
+### Frontend Logic
+- **Custom Design System:** I built a custom design system using Tailwind tokens to ensure visual consistency across all components.
+- **Protected Routes:** A secure routing system that redirects unauthenticated users to login and restricts features based on user roles.
+- **Optimistic UI:** When possible, the UI updates instantly while the backend processes requests, providing a snappy experience.
+
+### Database Schema
+- **Normalised Tables:** `Ingredients` (Catalog), `Stock` (Live Levels), `DailyBatches` (Usage Tracking), and `ActivityLogs` (Audit Trail) are all linked with foreign keys to ensure data consistency.
+- **Automated Seeding:** Scripts are provided to seed the database with an initial admin user and sample data for quick setup.

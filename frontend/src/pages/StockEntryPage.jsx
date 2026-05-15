@@ -48,7 +48,12 @@ export function StockEntryPage({ onSubmit, notify }) {
       setResults(data.results || []);
       if (notify) notify('Kitchen operations logged successfully', 'success');
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message || 'Intake process failed');
+      let msg = 'Intake process failed';
+      const detail = err?.response?.data?.detail;
+      if (typeof detail === 'string') msg = detail;
+      else if (Array.isArray(detail)) msg = detail.map(d => d.msg || d).join(', ');
+      else if (err.message) msg = err.message;
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -264,7 +269,10 @@ export function StockEntryPage({ onSubmit, notify }) {
                   className="space-y-6"
                 >
                   {results.map((r, i) => {
-                    const statusInfo = STATUS_BADGE[r.status] || STATUS_BADGE.unmapped;
+                    let statusInfo = STATUS_BADGE[r.status] || STATUS_BADGE.unmapped;
+                    if (r.needs_review && r.status === 'mapped') {
+                      statusInfo = { cls: 'badge-warning', label: 'Review Required' };
+                    }
                     const methodCls  = METHOD_BADGE[r.mapping_method] || 'badge-danger';
                     
                     return (
@@ -296,13 +304,20 @@ export function StockEntryPage({ onSubmit, notify }) {
                                <Quote size={14} className="text-luxury-gold shrink-0" />
                                <span className="text-xs text-luxury-text-secondary font-bold italic truncate max-w-[180px]">"{r.cleaned_text}"</span>
                             </div>
-                            <div className="flex items-baseline gap-2 shrink-0">
-                               <span className="text-2xl font-black text-luxury-gold tabular-nums">
-                                 {r.quantity != null ? r.quantity.toFixed(2) : '—'}
-                               </span>
-                               <span className="text-[10px] font-black text-luxury-gold/50 uppercase tracking-widest">{r.unit}</span>
-                            </div>
-                          </div>
+                             <div className="flex items-baseline gap-2 shrink-0">
+                                <span className={`text-2xl font-black tabular-nums ${r.quantity == null ? 'text-status-danger animate-pulse' : 'text-luxury-gold'}`}>
+                                  {r.quantity != null ? r.quantity.toFixed(2) : '—'}
+                                </span>
+                                <span className="text-[10px] font-black text-luxury-gold/50 uppercase tracking-widest">{r.unit || 'MISSING'}</span>
+                             </div>
+                           </div>
+
+                           {r.quantity == null && (
+                             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-status-danger/10 border border-status-danger/20 mb-4">
+                               <AlertCircle size={14} className="text-status-danger" />
+                               <span className="text-[9px] font-black text-status-danger uppercase tracking-widest">Quantity missing — review required</span>
+                             </div>
+                           )}
                           
                           <div className="space-y-3 px-1">
                             <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em]">

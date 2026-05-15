@@ -37,9 +37,9 @@ function ActivityRow({ item, compact, theme = 'warm' }) {
             <span className="text-lg font-black text-luxury-text-primary capitalize truncate tracking-tight group-hover:text-luxury-gold transition-colors">{item.ingredient}</span>
             <div className="w-1.5 h-1.5 rounded-full bg-luxury-gold/20 shrink-0" />
             <div className="flex items-baseline gap-1.5 shrink-0">
-               <span className="text-base font-black text-luxury-text-primary/60 tabular-nums">
-                 {item.quantity?.toFixed(1)}
-               </span>
+                <span className="text-base font-black text-luxury-text-primary/60 tabular-nums">
+                  {item.quantity != null ? item.quantity.toFixed(1) : '—'}
+                </span>
                <span className="text-[10px] font-black text-luxury-text-muted uppercase tracking-widest">
                  {item.unit}
                </span>

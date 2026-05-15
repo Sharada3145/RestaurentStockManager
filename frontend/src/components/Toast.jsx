@@ -32,7 +32,9 @@ export function Toast({ id, message, type = 'info', onDismiss }) {
          <Icon size={20} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] leading-relaxed italic">{message}</p>
+        <p className="text-[11px] font-black uppercase tracking-[0.2em] leading-relaxed italic">
+          {typeof message === 'string' ? message : JSON.stringify(message)}
+        </p>
       </div>
       <button
         onClick={onDismiss}

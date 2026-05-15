@@ -187,6 +187,32 @@ def map_unmapped(unmapped_id: int, payload: MapUnmappedRequest):
         session.close()
 
 
+@router.delete(
+    "/unmapped/{unmapped_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an unmapped entry from the queue",
+)
+def delete_unmapped(unmapped_id: int):
+    from backend.database import get_session
+    from backend.models import UnmappedEntry
+
+    session = get_session()
+    try:
+        with session.begin():
+            entry = session.query(UnmappedEntry).filter_by(id=unmapped_id).first()
+            if not entry:
+                raise HTTPException(status_code=404, detail="Entry not found")
+            session.delete(entry)
+        return None
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("delete_unmapped failed")
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
+    finally:
+        session.close()
+
+
 @router.get(
     "/activity",
     response_model=List[ActivityItem],

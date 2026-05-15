@@ -25,7 +25,7 @@ router = APIRouter(tags=["Stock"])
 class StockEntryRequest(BaseModel):
     raw_text:     str = Field(..., min_length=1, description="Free-form kitchen note")
     chef_name:    str = Field(..., min_length=1)
-    manager_name: str = Field(..., min_length=1)
+    manager_name: Optional[str] = Field(None, description="Reviewer")
 
 
 class ItemResult(BaseModel):
@@ -96,12 +96,19 @@ def create_entry(payload: StockEntryRequest) -> StockEntryResponse:
                     cleaned, session=session
                 )
 
+                # NEW: Force review if quantity is missing (but skip adding to unmapped_entries if it is)
+                if quantity is None:
+                    needs_review = True
+                    # Optionally lower confidence slightly to reflect incomplete data
+                    confidence = min(confidence, 85.0)
+
                 logger.info(
-                    "segment='%s' ingredient=%s conf=%.1f status=%s method=%s",
-                    seg, ingredient, confidence, map_status, method,
+                    "segment='%s' ingredient=%s conf=%.1f status=%s method=%s needs_review=%s",
+                    seg, ingredient, confidence, map_status, method, needs_review
                 )
 
-                if map_status == "mapped" and ingredient != "unmapped":
+                # Log to ledger only if mapping is confident AND quantity is present
+                if map_status == "mapped" and ingredient != "unmapped" and quantity is not None:
                     ing_record = session.query(Ingredient).filter_by(name=ingredient).first()
                     if ing_record:
                         log = UsageLog(
@@ -118,9 +125,9 @@ def create_entry(payload: StockEntryRequest) -> StockEntryResponse:
                         session.add(log)
                         session.flush()
 
-                        if quantity is not None:
-                            deduct_stock(session, ing_record.id, quantity, unit or "")
-                else:
+                        deduct_stock(session, ing_record.id, quantity, unit or "")
+                elif quantity is not None:
+                    # Redirect to UnmappedEntry ONLY if quantity is present but mapping failed
                     unmapped = UnmappedEntry(
                         raw_text=seg,
                         chef_name=payload.chef_name,
@@ -131,13 +138,16 @@ def create_entry(payload: StockEntryRequest) -> StockEntryResponse:
                     )
                     session.add(unmapped)
                     session.flush()
+                else:
+                    # Quantity is missing - we skip adding to UnmappedEntry as per user request
+                    logger.warning("Skipping segment '%s' due to missing quantity", seg)
 
                 results.append(ItemResult(
                     cleaned_text=cleaned,
                     quantity=quantity,
                     unit=unit,
                     ingredient=ingredient,
-                    confidence=confidence,
+                    confidence=float(confidence or 0),
                     status=map_status,
                     mapping_method=method,
                     needs_review=needs_review,

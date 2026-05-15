@@ -162,7 +162,13 @@ export default function App() {
       refreshDashboard({ silent: true });
       return data;
     } catch (err) {
-      notify(err?.response?.data?.detail || 'Submission failed', 'error');
+      let msg = 'Submission failed';
+      const detail = err?.response?.data?.detail;
+      if (typeof detail === 'string') msg = detail;
+      else if (Array.isArray(detail)) msg = detail.map(d => d.msg || d).join(', ');
+      else if (err.message) msg = err.message;
+      
+      notify(msg, 'error');
       throw err;
     }
   }, [notify, addPendingEntry, optimisticIncrement, refreshDashboard]);

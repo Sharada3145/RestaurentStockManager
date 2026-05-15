@@ -23,6 +23,7 @@ export const postBatch        = (payload) => api.post('/batches', payload).then(
 // ── Analytics ─────────────────────────────────────────────────────────────
 export const getUsage           = (days) => api.get('/usage', { params: days ? { days } : {} }).then((r) => r.data);
 export const getUnmapped        = ()     => api.get('/unmapped').then((r) => r.data);
+export const deleteUnmapped     = (id)   => api.delete(`/unmapped/${id}`).then((r) => r.data);
 export const getActivity        = (limit = 20) => api.get('/activity', { params: { limit } }).then((r) => r.data);
 export const postMap            = (unmappedId, ingredientName) =>
   api.post('/map', { ingredient_name: ingredientName }, { params: { unmapped_id: unmappedId } }).then((r) => r.data);

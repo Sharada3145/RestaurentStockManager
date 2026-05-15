@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   getActivity, getAllForecasts, getHealth,
-  getInventory, getUnmapped, getUsage, getTodayBatches
+  getInventory, getUnmapped, getUsage, getTodayBatches, deleteUnmapped
 } from '../services/api';
 
 const DashboardCtx = createContext(null);
@@ -123,6 +123,16 @@ export function DashboardProvider({ children }) {
 
   const refreshDashboard = useCallback((opts) => fetchAll(opts), [fetchAll]);
 
+  const removeUnmapped = useCallback(async (id) => {
+    try {
+      await deleteUnmapped(id);
+      setUnmapped((prev) => prev.filter((item) => item.id !== id));
+      setCounters((prev) => ({ ...prev, unmappedCount: Math.max(0, prev.unmappedCount - 1) }));
+    } catch (err) {
+      console.error('Failed to delete unmapped entry:', err);
+    }
+  }, []);
+
   const value = {
     health,
     inventory,
@@ -141,6 +151,7 @@ export function DashboardProvider({ children }) {
     refreshDashboard,
     optimisticIncrement,
     addPendingEntry,
+    removeUnmapped,
   };
 
   return <DashboardCtx.Provider value={value}>{children}</DashboardCtx.Provider>;

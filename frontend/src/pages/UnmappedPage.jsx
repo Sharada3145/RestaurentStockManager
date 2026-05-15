@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, ScanSearch, Loader2, Target, Brain, Fingerprint, Clock, Check, X, Quote, Zap, Sparkles } from 'lucide-react';
+import { CheckCircle, ScanSearch, Loader2, Target, Brain, Fingerprint, Clock, Check, X, Quote, Zap, Sparkles, Trash2 } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
 import { useDashboard } from '../context/DashboardContext';
 
 export function UnmappedPage({ onMap }) {
-  const { unmapped, loading } = useDashboard();
+  const { unmapped, loading, removeUnmapped } = useDashboard();
   const [mappingId, setMappingId] = useState(null);
   const [inputVal, setInputVal] = useState('');
   const [busy, setBusy] = useState(false);
@@ -137,12 +137,21 @@ export function UnmappedPage({ onMap }) {
                   </div>
 
                   {mappingId !== entry.id && (
-                    <button
-                      onClick={() => { setMappingId(entry.id); setInputVal(entry.attempted_label || ''); }}
-                      className="btn-primary h-16 px-10 text-[11px] uppercase tracking-[0.2em] font-black shadow-gold-lg shrink-0 self-start xl:self-center"
-                    >
-                      Audit & Reconcile
-                    </button>
+                    <div className="flex items-center gap-4 shrink-0 self-start xl:self-center">
+                      <button
+                        onClick={() => { setMappingId(entry.id); setInputVal(entry.attempted_label || ''); }}
+                        className="btn-primary h-16 px-10 text-[11px] uppercase tracking-[0.2em] font-black shadow-gold-lg"
+                      >
+                        Audit & Reconcile
+                      </button>
+                      <button
+                        onClick={() => removeUnmapped(entry.id)}
+                        className="w-16 h-16 rounded-2xl bg-white border border-luxury-border flex items-center justify-center text-luxury-text-muted hover:text-status-danger hover:border-status-danger transition-all shadow-sm"
+                        title="Delete entry"
+                      >
+                        <Trash2 size={22} />
+                      </button>
+                    </div>
                   )}
                 </div>
 
